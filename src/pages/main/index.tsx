@@ -12,10 +12,6 @@ const MainPage = () => {
   const Context = useContext(AppContext);
 
   const windowMake = () => {
-    // Context.CreateWindow(
-    //   <ComponentExample />,
-    //   "Test Window",
-    // )
     const abt = AboutWindow();
     Context.CreateWindow(
       abt.element,
@@ -25,7 +21,6 @@ const MainPage = () => {
       abt.minimumSize,
       abt.initialSize,
     );
-   
   };
 
   useEffect(() => {

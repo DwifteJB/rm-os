@@ -1,5 +1,5 @@
-import { createContext, ReactElement, useState } from "react";
-import { AppContextType, Size } from "../../types";
+import { createContext, ReactElement, useEffect, useState } from "react";
+import { AppContextType, Settings, Size } from "../../types";
 import Window, { windowProps } from "../Windows";
 
 export const AppContext = createContext<AppContextType>(null!);
@@ -11,6 +11,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(
     import.meta.env.MODE === "development" ? false : true,
   );
+  const [settings, setSettings]= useState<Settings>({});
 
   const CreateWindow = (
     children: ReactElement,
@@ -62,6 +63,13 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  useEffect(() => {
+    if (localStorage.getItem("settings")) {
+      setSettings(JSON.parse(localStorage.getItem("settings") as string));
+    }
+  }, [])
+
+
   return (
     <AppContext.Provider
       value={{
@@ -76,6 +84,8 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           loading,
           setLoading,
         },
+        settings,
+        setSettings
       }}
     >
       {children}

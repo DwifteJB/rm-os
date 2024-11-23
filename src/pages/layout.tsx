@@ -28,6 +28,7 @@ interface SelectionBox {
 }
 
 const Layout = ({ children }: PropsWithChildren<object>) => {
+  const { settings } = useContext(AppContext);
   const Context = useContext(AppContext);
   const [isSelecting, setIsSelecting] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -177,6 +178,17 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
     };
   }, [selectionBox]);
 
+  const getBackgroundStyles = () => {
+    if (!settings.backgroundImage) return {};
+    
+    return {
+      backgroundImage: `url(${settings.backgroundImage})`,
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover'
+    };
+  };
+
   return (
     <SelectionContext.Provider
       value={{ selectedShortcuts, setSelectedShortcuts }}
@@ -190,6 +202,7 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
         style={{
           position: "relative",
           cursor: isDragging ? "crosshair" : "default",
+          ...getBackgroundStyles()
         }}
         className="flex w-screen h-screen relative select-none bg-[#0B0B0B]"
       >

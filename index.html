@@ -10,14 +10,12 @@
     <script src="/baremux/index.js"></script>
 
     <script>
-    if ("serviceWorker" in navigator) {
+      if ("serviceWorker" in navigator) {
         window.addEventListener("load", async () => {
-            await navigator.serviceWorker.register("/uv/sw.js");
+          await navigator.serviceWorker.register("/uv/sw.js");
         });
-    }
+      }
     </script>
-
-    
 
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />

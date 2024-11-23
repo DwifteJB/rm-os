@@ -1,6 +1,9 @@
 import AboutWindow from "../windows/about";
 import Browser from "../windows/browser";
 import type { Size } from "../types";
+import Fishing from "../windows/fishGame";
+import MeowCat from "../windows/cat";
+import Settings from "../windows/settings";
 
 export interface WindowConfig {
   Component: () => {
@@ -22,5 +25,17 @@ export const allWindows: WindowConfig[] = [
   {
     Component: Browser,
     showInLaunchpad: true,
+  },
+  {
+    Component: Fishing,
+    showInLaunchpad: true,
+  },
+  {
+    Component: MeowCat,
+    showInLaunchpad: true,
+  },
+  {
+    Component: Settings,
+    showInLaunchpad: true
   }
 ];
