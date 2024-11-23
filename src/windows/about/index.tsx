@@ -30,7 +30,7 @@ const AboutWindow = () => {
       </>
     ),
     name: "About",
-    icon: undefined,
+    icon: "info.png",
     customBackgroundClasses: "bg-black",
     minimumSize: { width: 300, height: 400 },
     initialSize: { width: 300, height: 400 },

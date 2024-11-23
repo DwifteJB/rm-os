@@ -43,7 +43,7 @@ const Window = ({
 }: PropsWithChildren<windowProps>) => {
   const Context = useContext(AppContext);
   const [windowPosition, setWindowPosition] = useState<Position>({
-    x: (Math.random() * window.innerWidth) / 1.2,
+    x: Math.max(0, (Math.random() * window.innerWidth) / 1.4),
     y: (Math.random() * window.innerHeight) / 2,
   });
   const [windowSize, setWindowSize] = useState<Size>({

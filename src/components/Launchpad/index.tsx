@@ -26,7 +26,7 @@ const LaunchPad = ({
 
   return (
     <div
-      className="h-screen w-screen absolute bg-black/80"
+      className="h-screen w-screen absolute bg-black/80 backdrop-blur-sm"
       onClick={() => setIsOpen(!isOpen)}
       style={{
         zIndex: 5000,
@@ -37,7 +37,7 @@ const LaunchPad = ({
       }}
     >
       <div
-        className="bg-black border-white border-dotted rounded-md w-[80%] h-[80%] border-4 absolute"
+        className="bg-black/90 backdrop-blur-sm border-white border-dotted rounded-md w-[80%] h-[80%] border-4 absolute"
         style={{
           zIndex: 34534534,
           top: "50%",
@@ -55,7 +55,7 @@ const LaunchPad = ({
                 return (
                   <div
                     key={index}
-                    className="flex flex-col items-center justify-center p-4 hover:bg-white/10 rounded-lg cursor-pointer"
+                    className="flex flex-col items-center justify-center p-4 hover:bg-[#C22DC2]/80 rounded-lg cursor-pointer"
                     onClick={() => handleLaunchApp(window)}
                   >
                     {windowData.icon ? (
@@ -67,7 +67,7 @@ const LaunchPad = ({
                     ) : (
                       <div className="w-16 h-16 bg-white/10 rounded-lg mb-2" />
                     )}
-                    <span className="text-white text-sm">
+                    <span className="text-white text-sm inter">
                       {windowData.name}
                     </span>
                   </div>
