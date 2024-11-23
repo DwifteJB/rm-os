@@ -11,7 +11,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(
     import.meta.env.MODE === "development" ? false : true,
   );
-  const [settings, setSettings]= useState<Settings>({});
+  const [settings, setSettings] = useState<Settings>({});
 
   const CreateWindow = (
     children: ReactElement,
@@ -67,8 +67,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (localStorage.getItem("settings")) {
       setSettings(JSON.parse(localStorage.getItem("settings") as string));
     }
-  }, [])
-
+  }, []);
 
   return (
     <AppContext.Provider
@@ -85,7 +84,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           setLoading,
         },
         settings,
-        setSettings
+        setSettings,
       }}
     >
       {children}

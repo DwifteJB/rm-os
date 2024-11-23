@@ -4,6 +4,7 @@ import type { Size } from "../types";
 import Fishing from "../windows/fishGame";
 import MeowCat from "../windows/cat";
 import Settings from "../windows/settings";
+import MusicPlayer from "../windows/musicPlayer";
 
 export interface WindowConfig {
   Component: () => {
@@ -36,6 +37,10 @@ export const allWindows: WindowConfig[] = [
   },
   {
     Component: Settings,
-    showInLaunchpad: true
-  }
+    showInLaunchpad: true,
+  },
+  {
+    Component: MusicPlayer,
+    showInLaunchpad: true,
+  },
 ];

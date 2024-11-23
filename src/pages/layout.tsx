@@ -179,13 +179,18 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
   }, [selectionBox]);
 
   const getBackgroundStyles = () => {
-    if (!settings.backgroundImage) return {};
-    
+    if (!settings.backgroundImage) return {
+      backgroundImage: `url(/wallpaper.jpg)`,
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
+    };;
+
     return {
       backgroundImage: `url(${settings.backgroundImage})`,
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover'
+      backgroundPosition: "center",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "cover",
     };
   };
 
@@ -202,7 +207,7 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
         style={{
           position: "relative",
           cursor: isDragging ? "crosshair" : "default",
-          ...getBackgroundStyles()
+          ...getBackgroundStyles(),
         }}
         className="flex w-screen h-screen relative select-none bg-[#0B0B0B]"
       >

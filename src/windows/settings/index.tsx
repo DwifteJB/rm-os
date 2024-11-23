@@ -15,9 +15,9 @@ const SettingsElement = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setLocalSettings(prev => ({
+        setLocalSettings((prev) => ({
           ...prev,
-          backgroundImage: reader.result as string
+          backgroundImage: reader.result as string,
         }));
       };
       reader.readAsDataURL(file);
@@ -25,15 +25,15 @@ const SettingsElement = () => {
   };
 
   const handleRemoveImage = () => {
-    setLocalSettings(prev => ({
+    setLocalSettings((prev) => ({
       ...prev,
-      backgroundImage: undefined
+      backgroundImage: undefined,
     }));
   };
 
   const handleSave = () => {
     setSettings(localSettings);
-    localStorage.setItem('settings', JSON.stringify(localSettings));
+    localStorage.setItem("settings", JSON.stringify(localSettings));
   };
 
   return (
@@ -41,14 +41,19 @@ const SettingsElement = () => {
       <div className="text-center">
         <h2 className="text-xl inter font-bold mb-4">Settings :D</h2>
       </div>
-      
+
       <div className="space-y-4">
         <div>
           <label className="block mb-2 inter">Username</label>
           <input
             type="text"
-            value={localSettings.username || ''}
-            onChange={(e) => setLocalSettings(prev => ({ ...prev, username: e.target.value }))}
+            value={localSettings.username || ""}
+            onChange={(e) =>
+              setLocalSettings((prev) => ({
+                ...prev,
+                username: e.target.value,
+              }))
+            }
             className="bg-[#C22DC2]/50 p-2 rounded w-full"
           />
         </div>
@@ -65,7 +70,11 @@ const SettingsElement = () => {
               />
               <div className="bg-[#C22DC2]/50 p-2 rounded w-full flex items-center gap-2">
                 <ImagePlus size={20} />
-                <span>{localSettings.backgroundImage ? 'Change Image' : 'Choose Image'}</span>
+                <span>
+                  {localSettings.backgroundImage
+                    ? "Change Image"
+                    : "Choose Image"}
+                </span>
               </div>
             </div>
             {localSettings.backgroundImage && (
@@ -81,13 +90,13 @@ const SettingsElement = () => {
           {localSettings.backgroundImage && (
             <div className="mt-2 rounded-lg overflow-hidden bg-[#C22DC2]/20 p-2">
               <div className="relative w-full h-64">
-                <img 
-                  src={localSettings.backgroundImage} 
-                  alt="Background Preview" 
+                <img
+                  src={localSettings.backgroundImage}
+                  alt="Background Preview"
                   className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 max-w-full max-h-full min-w-[50%] min-h-[50%] rounded object-contain"
                   style={{
-                    width: 'auto',
-                    height: 'auto'
+                    width: "auto",
+                    height: "auto",
                   }}
                 />
               </div>
@@ -95,14 +104,14 @@ const SettingsElement = () => {
           )}
         </div>
 
-          <div className="text-center items-center">
-            <button
+        <div className="text-center items-center">
+          <button
             onClick={handleSave}
             className="bg-[#C22DC2] px-4 py-2 rounded hover:bg-[#C22DC2]/80 transition-colors"
-            >
+          >
             Save Settings
-            </button>
-          </div>
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -112,9 +121,9 @@ export const Settings = () => {
   const window = {
     element: <SettingsElement />,
     name: "settings",
-    icon: "cat.png",
-    minimumSize: { width: 200, height: 400 },
-    initialSize: { width: 500, height: 500 },
+    icon: "settings.png",
+    minimumSize: { width: 300, height: 650 },
+    initialSize: { width: 500, height: 650 },
     customBackgroundClasses: "",
   };
 

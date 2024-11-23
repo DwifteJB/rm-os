@@ -4,7 +4,7 @@ import { windowProps } from "../components/Windows";
 export interface Settings {
   backgroundImage?: string; // as base64 png
   username?: string; // username for terminal if made
-  wallpaperPosition?: 'center' | 'stretch' | 'tile';
+  wallpaperPosition?: "center" | "stretch" | "tile";
 }
 export interface Size {
   width: number;

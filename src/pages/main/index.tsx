@@ -1,17 +1,22 @@
 import TaskBar from "../../components/TaskBar";
 import Layout from "../layout";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../components/mainAppContext";
 import BootSequence from "../boot";
 import Shortcut from "../../components/Shortcut";
 import TopBar from "../../components/TopBar";
 
 import AboutWindow from "../../windows/about";
+import MusicPlayer from "../../windows/musicPlayer";
+import { allWindows } from "../../lib/allWindows";
+import MeowCat from "../../windows/cat";
 
 const MainPage = () => {
   const Context = useContext(AppContext);
+  const [hasMadeFirstRender, setHasMadeFirstRender] = useState(false);
+  const [hasMadeSecondRender, setHasMadeSecondRender] = useState(false);
 
-  const windowMake = () => {
+  useEffect(() => {
     const abt = AboutWindow();
     Context.CreateWindow(
       abt.element,
@@ -21,11 +26,39 @@ const MainPage = () => {
       abt.minimumSize,
       abt.initialSize,
     );
-  };
+
+    setHasMadeFirstRender(true);
+  }, []);
 
   useEffect(() => {
-    windowMake();
-  }, []);
+    if (!hasMadeFirstRender) return;
+    const music = MusicPlayer();
+
+    Context.CreateWindow(
+      music.element,
+      music.name,
+      music.icon,
+      music.customBackgroundClasses,
+      music.minimumSize,
+      music.initialSize,
+    );
+    setHasMadeSecondRender(true);
+  }, [hasMadeFirstRender])
+
+  useEffect(() => {
+    if (!hasMadeSecondRender) return;
+
+    const cat = MeowCat();
+
+    Context.CreateWindow(
+      cat.element,
+      cat.name,
+      cat.icon,
+      cat.customBackgroundClasses,
+      cat.minimumSize,
+      cat.initialSize,
+    );
+  }, [hasMadeSecondRender]);
 
   if (Context.loading.loading) {
     return <BootSequence />;
@@ -52,16 +85,18 @@ const MainPage = () => {
             justifyContent: "start",
           }}
         >
-          {[...Array(40)].map((_, index) => (
+          {[...allWindows].map((windowConfig, index) => (
             <div key={index} className="p-1">
               <Shortcut
                 id={Math.random().toString(36).substring(7)}
-                icon="https://github.com/DwifteJB.png"
-                text={`Shortcut ${index + 1}`}
+                icon={windowConfig.Component().icon as string}
+                text={windowConfig.Component().name}
                 window={{
-                  class: "bg-black",
-                  element: <div></div>,
-                  name: `Shortcut ${index + 1}`,
+                  element: windowConfig.Component().element,
+                  class: windowConfig.Component().customBackgroundClasses as string,
+                  name: windowConfig.Component().name,
+                  minimumSize: windowConfig.Component().minimumSize,
+                  initialSize: windowConfig.Component().initialSize,
                 }}
               />
             </div>

@@ -27,13 +27,22 @@ const AboutWindow = () => {
             for fun!
           </p>
         </div>
+
+        <div className="w-full h-20 text-center p-4">
+          <p className="text-white">who am i?</p>
+
+          <p className="text-white">
+            i am rmfosho/dwiftejb who is the founder of aurality, worked at
+            yeezy and works on multiple different tribal projects
+          </p>
+        </div>
       </>
     ),
     name: "About",
     icon: "info.png",
     customBackgroundClasses: "bg-black",
-    minimumSize: { width: 300, height: 400 },
-    initialSize: { width: 300, height: 400 },
+    minimumSize: { width: 300, height: 500 },
+    initialSize: { width: 300, height: 500 },
   };
 
   return window;
