@@ -5,6 +5,20 @@
     github.com/dwiftejb
   -->
   <head>
+    <script src="/uv/uv.bundle.js"></script>
+    <script src="/uv/uv.config.js"></script>
+    <script src="/baremux/index.js"></script>
+
+    <script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", async () => {
+            await navigator.serviceWorker.register("/uv/sw.js");
+        });
+    }
+    </script>
+
+    
+
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />

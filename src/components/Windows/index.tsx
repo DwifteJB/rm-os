@@ -307,9 +307,9 @@ const Window = ({
       </div>
       {/* Window content */}
       <div
-        className="p-2 overflow-auto relative"
+        className="p-2 overflow-hidden relative"
         style={{
-          height: "calc(100% - 1.5rem)",
+          height: "calc(100% - 2.5rem)",
           zIndex: 1001,
         }}
       >

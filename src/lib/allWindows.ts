@@ -1,4 +1,5 @@
 import AboutWindow from "../windows/about";
+import Browser from "../windows/browser";
 import type { Size } from "../types";
 
 export interface WindowConfig {
@@ -18,4 +19,8 @@ export const allWindows: WindowConfig[] = [
     Component: AboutWindow,
     showInLaunchpad: true,
   },
+  {
+    Component: Browser,
+    showInLaunchpad: true,
+  }
 ];

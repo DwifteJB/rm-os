@@ -54,7 +54,7 @@ const BootSequence = () => {
             setText((prevText) => [...prevText, text]);
             resolve(void 0);
           }, text.time);
-          timeoutsRef.current.push(timeoutId);
+          timeoutsRef.current.push(timeoutId as unknown as number);
         });
         await timeout;
       }

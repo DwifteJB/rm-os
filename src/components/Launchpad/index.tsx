@@ -26,18 +26,21 @@ const LaunchPad = ({
 
   return (
     <div
-      className="h-screen w-screen absolute bg-black/80 backdrop-blur-sm"
+      className={`h-screen w-screen absolute bg-black/80 backdrop-blur-sm transition-all duration-300 ${
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
       onClick={() => setIsOpen(!isOpen)}
       style={{
         zIndex: 5000,
-        display: isOpen ? "block" : "none",
         top: "100%",
         left: "50%",
         transform: "translate(-50%, -100%)",
       }}
     >
       <div
-        className="bg-black/90 backdrop-blur-sm border-white border-dotted rounded-md w-[80%] h-[80%] border-4 absolute"
+        className={`bg-black/90 backdrop-blur-sm border-white border-dotted rounded-md w-[80%] h-[80%] border-4 absolute transition-all duration-300 ${
+          isOpen ? "scale-100" : "scale-95"
+        }`}
         style={{
           zIndex: 34534534,
           top: "50%",
