@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import { AppContext } from "../mainAppContext";
 
-import { LayoutGrid } from 'lucide-react';
+import { LayoutGrid } from "lucide-react";
 
 import { Popover } from "react-tiny-popover";
+import LaunchPad from "../Launchpad";
 
 const TaskBarItem = ({
   windowName,
@@ -60,6 +61,7 @@ const TaskBarItem = ({
 };
 const TaskBar = () => {
   const Context = useContext(AppContext);
+  const [isLaunchPadOpen, setLaunchPadOpen] = useState(false);
 
   return (
     <header
@@ -68,9 +70,15 @@ const TaskBar = () => {
         zIndex: 6,
       }}
     >
+      <LaunchPad isOpen={isLaunchPadOpen} setIsOpen={setLaunchPadOpen} />
       <div className="flex justify-between items-center h-full">
         <div className="flex flex-row items-center pl-2 pb-4">
-          <div className="w-10 h-10 items-center align-middle justify-center text-center flex rounded bg-[#C22DC2]">
+          <div
+            className="w-10 h-10 items-center align-middle justify-center text-center flex rounded bg-[#C22DC2] cursor-pointer"
+            onClick={() => {
+              setLaunchPadOpen(!isLaunchPadOpen);
+            }}
+          >
             <LayoutGrid color="white" />
           </div>
           {Context.windows.map((win) => {

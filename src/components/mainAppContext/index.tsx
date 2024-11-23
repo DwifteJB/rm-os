@@ -19,7 +19,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     icon?: string,
     customBackgroundClasses?: string,
     minimumSize?: Size,
-    initialSize?: Size
+    initialSize?: Size,
   ) => {
     const windowId = Math.random().toString(36).substring(7);
     const window = (

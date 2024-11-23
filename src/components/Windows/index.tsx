@@ -39,7 +39,7 @@ const Window = ({
   id,
   icon,
   minimumSize,
-  initialSize
+  initialSize,
 }: PropsWithChildren<windowProps>) => {
   const Context = useContext(AppContext);
   const [windowPosition, setWindowPosition] = useState<Position>({
@@ -218,7 +218,7 @@ const Window = ({
 
   return (
     <div
-      className={`${customBackgroundClasses} ${Context.mainWindow === id ? "border-solid" : "border-dotted"} rounded-md border border-[#474747] absolute
+      className={`${customBackgroundClasses} ${Context.mainWindow === id ? "border-solid border-2" : "border-dotted border-2"} rounded-md border-[#474747] absolute
         ${isDragging ? "cursor-grabbing select-none" : ""}
         ${isResizing ? "cursor-se-resize select-none" : ""}
         ${isHidden ? "pointer-events-none opacity-0" : "opacity-100"}
@@ -244,7 +244,7 @@ const Window = ({
     >
       {/* top bar background */}
       <div
-        className={`h-6 w-full rounded-t-md cursor-grab relative bg-[#1f1e24]/50
+        className={`h-10 w-full rounded-t-md cursor-grab relative bg-[#1f1e24]/50
           ${isDragging ? "cursor-grabbing" : ""}
           ${isMaximized ? "rounded-none" : ""}`}
         onMouseDown={handleMouseDown}
@@ -265,18 +265,16 @@ const Window = ({
             {icon && (
               <>
                 <img src={icon} className="w-4 h-4" alt={windowName} />
-                <div className="w-4 h-4 absolute" />
+                <div className="w-6 h-6 absolute" />
               </>
             )}
-            <span className="text-white w-full inter pl-2">
-              {windowName}
-            </span>
+            <span className="text-white w-full inter pl-2">{windowName}</span>
           </div>
           {/* right side (minimize, maximize and close buttons) */}
           <div className="flex flex-row items-center justify-end w-full">
             {/* Minimize button */}
             <div
-              className="w-4 h-4 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
               onClick={(e) => {
                 e.stopPropagation();
                 Context.toggleWindowVisibility(id);
@@ -286,7 +284,7 @@ const Window = ({
             </div>
             {/* Maximize button */}
             <div
-              className="w-4 h-4 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
               onClick={(e) => {
                 e.stopPropagation();
                 maximize();
@@ -296,7 +294,7 @@ const Window = ({
             </div>
             {/* Close button */}
             <div
-              className="w-4 h-4 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
               onClick={(e) => {
                 e.stopPropagation();
                 Context.RemoveWindow(id);
@@ -320,7 +318,7 @@ const Window = ({
       {/* Resize handle */}
       {!isMaximized && (
         <div
-          className="w-4 h-4 absolute bottom-0 right-0 cursor-se-resize bg-gray-200 hover:bg-gray-300 rounded-bl"
+          className="w-4 h-4 absolute bottom-0 right-0 cursor-se-resize  rounded-bl"
           onMouseDown={handleResizeStart}
           style={{
             zIndex: 1002,

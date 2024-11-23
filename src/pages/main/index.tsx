@@ -6,33 +6,44 @@ import BootSequence from "../boot";
 import Shortcut from "../../components/Shortcut";
 import TopBar from "../../components/TopBar";
 
+import AboutWindow from "../../windows/about";
+
 const MainPage = () => {
   const Context = useContext(AppContext);
 
   const windowMake = () => {
+    const abt = AboutWindow();
     Context.CreateWindow(
-      <div className="flex flex-col h-full w-full">
-        <div className="text-center items-center justify-center h-full w-full">
-          <h1 className="text-white source-code-pro">Welcome to my website!</h1>
-          <h1 className="text-white source-code-pro">
-            This is a test to see how text is scaled when the window is
-            stretched and stuff :3
-          </h1>
-          <h1 className="text-white source-code-pro">Yuh Yuh Yuh</h1>
-        </div>
-      </div>,
-      Math.random().toString(36).substring(7),
-      "winxp/DVD.png",
-      "bg-black",
-      {
-        height: 500,
-        width: 500,
-      },
-      {
-        height: 600,
-        width: 600
-      }
+      abt.element,
+      abt.name,
+      abt.icon,
+      abt.customBackgroundClasses,
+      abt.minimumSize,
+      abt.initialSize,
     );
+    // Context.CreateWindow(
+    //   <div className="flex flex-col h-full w-full">
+    //     <div className="text-center items-center justify-center h-full w-full">
+    //       <h1 className="text-white source-code-pro">Welcome to my website!</h1>
+    //       <h1 className="text-white source-code-pro">
+    //         This is a test to see how text is scaled when the window is
+    //         stretched and stuff :3
+    //       </h1>
+    //       <h1 className="text-white source-code-pro">Yuh Yuh Yuh</h1>
+    //     </div>
+    //   </div>,
+    //   Math.random().toString(36).substring(7),
+    //   "winxp/DVD.png",
+    //   "bg-black",
+    //   {
+    //     height: 500,
+    //     width: 500,
+    //   },
+    //   {
+    //     height: 600,
+    //     width: 600
+    //   }
+    // );
   };
 
   useEffect(() => {

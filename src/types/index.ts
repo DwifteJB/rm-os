@@ -22,7 +22,6 @@ export interface AppContextType {
   hiddenWindows: Set<string>;
   toggleWindowVisibility: (windowId: string) => void;
 
-
   loading: {
     loading: boolean;
     setLoading: (value: boolean) => void;

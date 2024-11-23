@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 const TopBar = () => {
   const [time, setTime] = useState("00:00");
 
@@ -26,10 +25,7 @@ const TopBar = () => {
     >
       <div className="flex justify-between items-center h-full">
         <div className="flex flex-row items-center">
-          <div className="w-32 h-10 items-center align-middle justify-center text-center flex">
-           
-          </div>
-         
+          <div className="w-32 h-10 items-center align-middle justify-center text-center flex"></div>
         </div>
         {/* right side */}
         <div className="flex flex-row items-center pr-2">
