@@ -4,6 +4,8 @@ import expressWs from "express-ws"
 import prisma from "../lib/Prisma";
 
 import crypto from "crypto";
+import * as ws from "ws";
+
 
 // we generate username so its anon!
 const generateUsername = (req: express.Request) => {
@@ -15,7 +17,53 @@ const generateUsername = (req: express.Request) => {
     return username
 }
 
-export default function ChatRoutes(app: expressWs.Application) {
+export default function ChatRoutes(app: expressWs.Application, getWss: () => ws.Server) {
+    app.ws("/api/v1/chat/ws", (ws, req) => {
+        const username = generateUsername(req);
+        (ws as any).username = username;
+        console.log("Websocket connected");
+
+        ws.send(JSON.stringify({
+            type: "username",
+            username
+        }));
+
+        ws.on("close", () => {
+            console.log("Websocket disconnected");
+        });
+
+        ws.on("message", async (message) => {
+            const parsed = JSON.parse(message.toString());
+
+            if (parsed.type === "message") {
+                    
+                const badWordResponse = await checkForBadWords(parsed.message as string);
+
+                if (badWordResponse.isProfanity) {
+                    ws.send(JSON.stringify({
+                        type: "error",
+                        message: "Message contains bad words"
+                    }));
+                    return;
+                }
+
+                await prisma.message.create({
+                    data: {
+                        content: parsed.message as string,
+                        author: (ws as any).username
+                    }
+                });
+
+                getWss().clients.forEach(client => {
+                    client.send(JSON.stringify({
+                        type: "message",
+                        message: parsed.message,
+                    }));
+                });
+            }
+        });
+    });
+
     app.get("/api/v1/chat/getMessages", async (req, res) => {
         const messages = await prisma.message.findMany({
             orderBy: {
@@ -34,41 +82,4 @@ export default function ChatRoutes(app: expressWs.Application) {
             username
         });
     });
-
-    app.post("/api/v1/chat/send", async (req, res) => {
-        const username = generateUsername(req);
-
-        const { message } = req.body;
-
-        if (!message) {
-            return res.status(400).json({
-                error: "Message is required"
-            });
-        }
-
-        if (message.length > 300) {
-            return res.status(400).json({
-                error: "Message is too long"
-            });
-        }
-
-        const badWordResponse = await checkForBadWords(message);
-
-        if (badWordResponse.isProfanity) {
-            return res.status(400).json({
-                error: "Message contains bad words"
-            });
-        }
-
-        await prisma.message.create({
-            data: {
-                author: username,
-                content: message
-            }
-        });
-
-        res.json({
-            success: true
-        });
-    });
-}
+} 

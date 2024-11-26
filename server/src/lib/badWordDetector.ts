@@ -35,7 +35,7 @@ export const checkForBadWords = async (message: string): Promise<BadWordResponse
         body: JSON.stringify({ cleanMessage }),
     });
 
-    const data = await response.json();
+    const data: BadWordResponse = await response.json() as BadWordResponse;
 
     return data;
 };

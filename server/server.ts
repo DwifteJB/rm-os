@@ -28,7 +28,7 @@ app.use("/epoxy/", express.static(epoxyPath));
 app.use("/baremux/", express.static(baremuxPath));
 app.use("/baremod/", express.static(bareModulePath));
 
-ChatRoutes(app);
+ChatRoutes(app, getWss);
 
 app.use((req, res) => {
   console.log("404", req.url);
