@@ -43,7 +43,7 @@ const MainPage = () => {
       music.initialSize,
     );
     setHasMadeSecondRender(true);
-  }, [hasMadeFirstRender])
+  }, [hasMadeFirstRender]);
 
   useEffect(() => {
     if (!hasMadeSecondRender) return;
@@ -93,7 +93,8 @@ const MainPage = () => {
                 text={windowConfig.Component().name}
                 window={{
                   element: windowConfig.Component().element,
-                  class: windowConfig.Component().customBackgroundClasses as string,
+                  class: windowConfig.Component()
+                    .customBackgroundClasses as string,
                   name: windowConfig.Component().name,
                   minimumSize: windowConfig.Component().minimumSize,
                   initialSize: windowConfig.Component().initialSize,

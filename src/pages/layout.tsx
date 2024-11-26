@@ -179,12 +179,13 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
   }, [selectionBox]);
 
   const getBackgroundStyles = () => {
-    if (!settings.backgroundImage) return {
-      backgroundImage: `url(/wallpaper.jpg)`,
-      backgroundPosition: "center",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "cover",
-    };;
+    if (!settings.backgroundImage)
+      return {
+        backgroundImage: `url(/wallpaper.jpg)`,
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "cover",
+      };
 
     return {
       backgroundImage: `url(${settings.backgroundImage})`,

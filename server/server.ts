@@ -8,7 +8,7 @@ import express from "express";
 import { createServer } from "node:http";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import 'dotenv/config'
+import "dotenv/config";
 import ChatRoutes from "./src/routes/chat";
 
 import expressWs from "express-ws";
@@ -18,7 +18,6 @@ const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const publicPath = "dist";
 
 const { app, getWss, applyTo } = expressWs(express());
-
 
 app.use(express.static(join(__dirname, publicPath)));
 app.use("/uv/", express.static(uvPath));
@@ -39,8 +38,6 @@ app.use((req, res) => {
     xfdfaad: JSON.stringify(req.headers),
   });
 });
-
-
 
 const server = createServer();
 

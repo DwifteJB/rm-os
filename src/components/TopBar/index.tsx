@@ -23,18 +23,21 @@ const TopBar = () => {
         zIndex: 6,
       }}
     >
-      <div className="flex justify-between items-center pointer-events-none" style={{
-        zIndex: -219313
-      }}>
+      <div
+        className="flex justify-between items-center pointer-events-none"
+        style={{
+          zIndex: -219313,
+        }}
+      >
         <div className="flex-row items-center">
           <div className="w-[1px] h-[1px] items-center align-middle justify-center text-center flex"></div>
         </div>
         {/* right side */}
         <div className="flex flex-row items-center pr-2">
           <div className="w-24 h-10 backdrop-blur-sm rounded-xl bg-[#C22DC2]/50 border border-[#C22DC2] pointer-events-auto">
-        <div className="flex items-center justify-center w-full h-full text-center align-middle">
-          <span className="inter text-white text-center">{time}</span>
-        </div>
+            <div className="flex items-center justify-center w-full h-full text-center align-middle">
+              <span className="inter text-white text-center">{time}</span>
+            </div>
           </div>
         </div>
       </div>
