@@ -22,9 +22,9 @@ const generateUsername = (req: express.Request) => {
 
 export default function ChatRoutes(
   app: expressWs.Application,
-  getWss: () => ws.Server,
+  getWss: () => ws.WebSocketServer,
 ) {
-  app.ws("/api/v1/chat/ws", (ws, req) => {
+  app.ws("/chat", (ws, req) => {
     const username = generateUsername(req);
     (ws as any).username = username;
     console.log("Websocket connected");
@@ -40,6 +40,11 @@ export default function ChatRoutes(
       console.log("Websocket disconnected");
     });
 
+    ws.on("error", (err) => {
+      console.error("Websocket error:", err);
+      ws.close();
+    });
+
     ws.on("message", async (message) => {
       const parsed = JSON.parse(message.toString());
 
@@ -47,6 +52,8 @@ export default function ChatRoutes(
         const badWordResponse = await checkForBadWords(
           parsed.message as string,
         );
+
+        console.log(badWordResponse);
 
         if (badWordResponse.isProfanity) {
           ws.send(
@@ -70,14 +77,21 @@ export default function ChatRoutes(
             JSON.stringify({
               type: "message",
               message: parsed.message,
+              username: (ws as any).username,
             }),
           );
         });
+
+        ws.send(
+          JSON.stringify({
+            type: "messageSent",
+          }),
+        );
       }
     });
   });
 
-  app.get("/api/v1/chat/getMessages", async (req, res) => {
+  app.get("/chat/getMessages", async (req, res) => {
     let page = parseInt(req.query.page as string) || 1;
 
     if (page < 1) {
@@ -86,16 +100,21 @@ export default function ChatRoutes(
 
     const messages = await prisma.message.findMany({
       orderBy: {
-        createdAt: "desc",
+        createdAt: "desc", // keep desc ordering
       },
-      skip: Math.max(page - 1, 1) * 10,
+      skip: (page - 1) * 10,
       take: 10,
+      select: {
+        content: true,
+        author: true,
+        createdAt: true,
+      },
     });
 
     res.json(messages);
   });
 
-  app.get("/api/v1/chat/whoamI", async (req, res) => {
+  app.get("/chat/whoamI", async (req, res) => {
     const username = generateUsername(req);
 
     res.json({

@@ -5,9 +5,12 @@ import MainPage from "./pages/main";
 
 import { AppProvider } from "./components/mainAppContext";
 
+import { Toaster } from "react-hot-toast";
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppProvider>
+      <Toaster />
       <MainPage />
     </AppProvider>
   </StrictMode>,

@@ -210,7 +210,7 @@ const Layout = ({ children }: PropsWithChildren<object>) => {
           cursor: isDragging ? "crosshair" : "default",
           ...getBackgroundStyles(),
         }}
-        className="flex w-screen h-screen relative select-none bg-[#0B0B0B]"
+        className="flex w-screen h-screen min-w-screen min-h-screen relative select-none bg-[#0B0B0B]"
       >
         <div className="flex flex-col h-full w-full relative">{children}</div>
         {isSelecting && selectionBox && isDragging && (
