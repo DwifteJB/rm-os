@@ -100,7 +100,7 @@ export default function ChatRoutes(
 
     const messages = await prisma.message.findMany({
       orderBy: {
-        createdAt: "desc", 
+        createdAt: "asc", 
       },
       skip: (page - 1) * 10,
       take: 10,
