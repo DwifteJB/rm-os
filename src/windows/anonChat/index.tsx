@@ -66,7 +66,7 @@ const ChatPage = () => {
       const data = await response.json();
       console.log(data.reverse(), data);
       setMessages((prevMessages) => [
-        ...data.reverse().map((msg: any) => ({
+        ...data.map((msg: any) => ({
           type: "message",
           message: msg.content,
           username: msg.author,
