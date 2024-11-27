@@ -148,7 +148,7 @@ export const ChatWindow = () => {
   const window = {
     element: <ChatPage />,
     name: "chat",
-    icon: "cat.png",
+    icon: "message-circle.png",
     minimumSize: { width: 600, height: 600 },
     initialSize: { width: 700, height: 700 },
     customBackgroundClasses: "",
