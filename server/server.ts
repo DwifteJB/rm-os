@@ -14,6 +14,8 @@ import cors from "cors";
 
 import expressWs from "express-ws";
 
+console.log(`PRISMA: ${process.env.DATABASE_URL}`);
+
 const bare = createBareServer("/bare/");
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
 const publicPath = "../dist";

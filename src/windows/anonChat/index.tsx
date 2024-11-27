@@ -72,6 +72,7 @@ const ChatPage = () => {
           username: msg.author,
         })),
         ...prevMessages,
+
       ]);
     } catch (error) {
       console.error("Failed to fetch messages:", error);
@@ -100,7 +101,7 @@ const ChatPage = () => {
         onScroll={handleScroll}
       >
         <div className="min-h-full flex flex-col justify-end">
-          <div className="h-4"></div> {/* Padding to allow scrolling up */}
+          <div className="h-4"></div>
           {loading && <div>Loading...</div>}
           {messages.map((msg, index) => (
             <div
