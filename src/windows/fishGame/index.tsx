@@ -36,7 +36,7 @@ const BrowserComponent = () => {
   useEffect(() => {
     if (iframeWindowRef.current) {
       iframeWindowRef.current.src =
-        __uv$config.prefix + __uv$config.encodeUrl("https://rmfosho.me/fish");
+        __uv$config.prefix + __uv$config.encodeUrl("https://fish.rmfosho.me/");
     }
   }, [iframeWindowRef]);
 
