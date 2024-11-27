@@ -19,7 +19,7 @@ const MainPage = () => {
   const [hasMadeThirdRender, setHasMadeThirdRender] = useState(false);
 
   useEffect(() => {
-    const abt = ChatWindow();
+    const abt = AboutWindow();
     Context.CreateWindow(
       abt.element,
       abt.name,
@@ -32,51 +32,51 @@ const MainPage = () => {
     setHasMadeFirstRender(true);
   }, []);
 
-  // useEffect(() => {
-  //   if (!hasMadeFirstRender) return;
-  //   const music = MusicPlayer();
+  useEffect(() => {
+    if (!hasMadeFirstRender) return;
+    const music = MusicPlayer();
 
-  //   Context.CreateWindow(
-  //     music.element,
-  //     music.name,
-  //     music.icon,
-  //     music.customBackgroundClasses,
-  //     music.minimumSize,
-  //     music.initialSize,
-  //   );
-  //   setHasMadeSecondRender(true);
-  // }, [hasMadeFirstRender]);
+    Context.CreateWindow(
+      music.element,
+      music.name,
+      music.icon,
+      music.customBackgroundClasses,
+      music.minimumSize,
+      music.initialSize,
+    );
+    setHasMadeSecondRender(true);
+  }, [hasMadeFirstRender]);
 
-  // useEffect(() => {
-  //   if (!hasMadeSecondRender) return;
+  useEffect(() => {
+    if (!hasMadeSecondRender) return;
 
-  //   const cat = MeowCat();
+    const cat = MeowCat();
 
-  //   Context.CreateWindow(
-  //     cat.element,
-  //     cat.name,
-  //     cat.icon,
-  //     cat.customBackgroundClasses,
-  //     cat.minimumSize,
-  //     cat.initialSize,
-  //   );
-  //   setHasMadeThirdRender(true);
-  // }, [hasMadeSecondRender]);
+    Context.CreateWindow(
+      cat.element,
+      cat.name,
+      cat.icon,
+      cat.customBackgroundClasses,
+      cat.minimumSize,
+      cat.initialSize,
+    );
+    setHasMadeThirdRender(true);
+  }, [hasMadeSecondRender]);
 
-  // useEffect(() => {
-  //   if (!hasMadeFirstRender) return;
+  useEffect(() => {
+    if (!hasMadeFirstRender) return;
 
-  //   const chat = ChatWindow();
+    const chat = ChatWindow();
 
-  //   Context.CreateWindow(
-  //     chat.element,
-  //     chat.name,
-  //     chat.icon,
-  //     chat.customBackgroundClasses,
-  //     chat.minimumSize,
-  //     chat.initialSize,
-  //   );
-  // }, [hasMadeThirdRender]);
+    Context.CreateWindow(
+      chat.element,
+      chat.name,
+      chat.icon,
+      chat.customBackgroundClasses,
+      chat.minimumSize,
+      chat.initialSize,
+    );
+  }, [hasMadeThirdRender]);
 
   if (Context.loading.loading) {
     return <BootSequence />;
