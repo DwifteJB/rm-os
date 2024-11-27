@@ -10,14 +10,16 @@ import AboutWindow from "../../windows/about";
 import MusicPlayer from "../../windows/musicPlayer";
 import { allWindows } from "../../lib/allWindows";
 import MeowCat from "../../windows/cat";
+import ChatWindow from "../../windows/anonChat";
 
 const MainPage = () => {
   const Context = useContext(AppContext);
   const [hasMadeFirstRender, setHasMadeFirstRender] = useState(false);
   const [hasMadeSecondRender, setHasMadeSecondRender] = useState(false);
+  const [hasMadeThirdRender, setHasMadeThirdRender] = useState(false);
 
   useEffect(() => {
-    const abt = AboutWindow();
+    const abt = ChatWindow();
     Context.CreateWindow(
       abt.element,
       abt.name,
@@ -30,35 +32,51 @@ const MainPage = () => {
     setHasMadeFirstRender(true);
   }, []);
 
-  useEffect(() => {
-    if (!hasMadeFirstRender) return;
-    const music = MusicPlayer();
+  // useEffect(() => {
+  //   if (!hasMadeFirstRender) return;
+  //   const music = MusicPlayer();
 
-    Context.CreateWindow(
-      music.element,
-      music.name,
-      music.icon,
-      music.customBackgroundClasses,
-      music.minimumSize,
-      music.initialSize,
-    );
-    setHasMadeSecondRender(true);
-  }, [hasMadeFirstRender])
+  //   Context.CreateWindow(
+  //     music.element,
+  //     music.name,
+  //     music.icon,
+  //     music.customBackgroundClasses,
+  //     music.minimumSize,
+  //     music.initialSize,
+  //   );
+  //   setHasMadeSecondRender(true);
+  // }, [hasMadeFirstRender]);
 
-  useEffect(() => {
-    if (!hasMadeSecondRender) return;
+  // useEffect(() => {
+  //   if (!hasMadeSecondRender) return;
 
-    const cat = MeowCat();
+  //   const cat = MeowCat();
 
-    Context.CreateWindow(
-      cat.element,
-      cat.name,
-      cat.icon,
-      cat.customBackgroundClasses,
-      cat.minimumSize,
-      cat.initialSize,
-    );
-  }, [hasMadeSecondRender]);
+  //   Context.CreateWindow(
+  //     cat.element,
+  //     cat.name,
+  //     cat.icon,
+  //     cat.customBackgroundClasses,
+  //     cat.minimumSize,
+  //     cat.initialSize,
+  //   );
+  //   setHasMadeThirdRender(true);
+  // }, [hasMadeSecondRender]);
+
+  // useEffect(() => {
+  //   if (!hasMadeFirstRender) return;
+
+  //   const chat = ChatWindow();
+
+  //   Context.CreateWindow(
+  //     chat.element,
+  //     chat.name,
+  //     chat.icon,
+  //     chat.customBackgroundClasses,
+  //     chat.minimumSize,
+  //     chat.initialSize,
+  //   );
+  // }, [hasMadeThirdRender]);
 
   if (Context.loading.loading) {
     return <BootSequence />;
@@ -93,7 +111,8 @@ const MainPage = () => {
                 text={windowConfig.Component().name}
                 window={{
                   element: windowConfig.Component().element,
-                  class: windowConfig.Component().customBackgroundClasses as string,
+                  class: windowConfig.Component()
+                    .customBackgroundClasses as string,
                   name: windowConfig.Component().name,
                   minimumSize: windowConfig.Component().minimumSize,
                   initialSize: windowConfig.Component().initialSize,

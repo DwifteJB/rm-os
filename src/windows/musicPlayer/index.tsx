@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import WavesurferPlayer from "@wavesurfer/react";
 import CD from "../../components/CD";
 import WaveSurfer from "wavesurfer.js";
-import { useAnimate } from "react-simple-animate"
+import { useAnimate } from "react-simple-animate";
 
 import songs from "../../lib/songs";
 import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
@@ -54,16 +54,16 @@ const MusicPlayerPage = () => {
     } else {
       setSong(songs[0]);
     }
-  }
+  };
 
-    const prevSong = () => {
-        const index = songs.indexOf(song);
-        if (index > 0) {
-        setSong(songs[index - 1]);
-        } else {
-        setSong(songs[songs.length - 1]);
-        }
+  const prevSong = () => {
+    const index = songs.indexOf(song);
+    if (index > 0) {
+      setSong(songs[index - 1]);
+    } else {
+      setSong(songs[songs.length - 1]);
     }
+  };
 
   const onPlayPause = () => {
     if (wavesurfer) {
@@ -122,13 +122,22 @@ const MusicPlayerPage = () => {
       </div>
 
       <div className="text-center flex flex-row justify-center items-center gap-4">
-        <button onClick={prevSong} className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]">
-            <ArrowLeft size={25} />
+        <button
+          onClick={prevSong}
+          className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]"
+        >
+          <ArrowLeft size={25} />
         </button>
-        <button onClick={onPlayPause} className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]">
+        <button
+          onClick={onPlayPause}
+          className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]"
+        >
           {isPlaying ? <Pause size={25} /> : <Play size={25} />}
         </button>
-        <button onClick={nextSong} className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]">
+        <button
+          onClick={nextSong}
+          className="inter rounded-xl p-1 bg-[#C22DC2]/50 border border-[#C22DC2]"
+        >
           <ArrowRight size={25} />
         </button>
       </div>
@@ -148,6 +157,5 @@ export const MusicPlayer = () => {
 
   return window;
 };
-
 
 export default MusicPlayer;

@@ -8,11 +8,26 @@ import express from "express";
 import { createServer } from "node:http";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import "dotenv/config";
+import ChatRoutes from "./src/routes/chat";
+import cors from "cors";
+
+import expressWs from "express-ws";
 
 const bare = createBareServer("/bare/");
 const __dirname = fileURLToPath(new URL(".", import.meta.url));
-const app = express();
-const publicPath = "dist";
+const publicPath = "../dist";
+
+const { app, getWss, applyTo } = expressWs(express());
+
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type"],
+    credentials: true,
+  }),
+);
 
 app.use(express.static(join(__dirname, publicPath)));
 app.use("/uv/", express.static(uvPath));
@@ -21,6 +36,8 @@ console.log;
 app.use("/epoxy/", express.static(epoxyPath));
 app.use("/baremux/", express.static(baremuxPath));
 app.use("/baremod/", express.static(bareModulePath));
+
+ChatRoutes(app, getWss);
 
 app.use((req, res) => {
   console.log("404", req.url);
@@ -43,12 +60,17 @@ server.on("request", (req, res) => {
 });
 
 server.on("upgrade", (req, socket, head) => {
+  socket.on("error", (err) => {
+    console.error("WebSocket error:", err);
+  });
   if (req.url.endsWith("/wisp/")) {
     wisp.routeRequest(req, socket, head);
   } else if (bare.shouldRoute(req)) {
     bare.routeUpgrade(req, socket, head);
   } else {
-    socket.end();
+    getWss().handleUpgrade(req, socket, head, (ws) => {
+      getWss().emit("connection", ws, req);
+    });
   }
 });
 
@@ -58,6 +80,7 @@ if (isNaN(port)) port = 8080;
 
 server.on("listening", () => {
   const address = server.address();
+  if (!address && !address.port) return;
   console.log("rm-os on:");
   console.log(`\thttp://localhost:${address.port}`);
   console.log(

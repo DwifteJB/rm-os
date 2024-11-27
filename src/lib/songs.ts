@@ -13,5 +13,5 @@ export default [
     title: "Tell the Truth",
     src: "songs/Tell the Truth.mp3",
     icon: "persona4.jpeg",
-  }
+  },
 ];

@@ -1,0 +1,124 @@
+import { checkForBadWords } from "../lib/badWordDetector";
+import express from "express";
+import expressWs from "express-ws";
+import prisma from "../lib/Prisma";
+
+import crypto from "crypto";
+import * as ws from "ws";
+
+// we generate username so its anon!
+const generateUsername = (req: express.Request) => {
+  const userAgent = req.headers["user-agent"] || "unknown";
+  const ip = req.ip || req.connection.remoteAddress || "unknown";
+  const uniqueString = `${userAgent}-${ip}`;
+  const username = crypto
+    .createHash("md5")
+    .update(uniqueString)
+    .digest("hex")
+    .substring(0, 8);
+
+  return username;
+};
+
+export default function ChatRoutes(
+  app: expressWs.Application,
+  getWss: () => ws.WebSocketServer,
+) {
+  app.ws("/chat", (ws, req) => {
+    const username = generateUsername(req);
+    (ws as any).username = username;
+    console.log("Websocket connected");
+
+    ws.send(
+      JSON.stringify({
+        type: "username",
+        username,
+      }),
+    );
+
+    ws.on("close", () => {
+      console.log("Websocket disconnected");
+    });
+
+    ws.on("error", (err) => {
+      console.error("Websocket error:", err);
+      ws.close();
+    });
+
+    ws.on("message", async (message) => {
+      const parsed = JSON.parse(message.toString());
+
+      if (parsed.type === "message") {
+        const badWordResponse = await checkForBadWords(
+          parsed.message as string,
+        );
+
+        console.log(badWordResponse);
+
+        if (badWordResponse.isProfanity) {
+          ws.send(
+            JSON.stringify({
+              type: "error",
+              message: "Message contains bad words",
+            }),
+          );
+          return;
+        }
+
+        await prisma.message.create({
+          data: {
+            content: parsed.message as string,
+            author: (ws as any).username,
+          },
+        });
+
+        getWss().clients.forEach((client) => {
+          client.send(
+            JSON.stringify({
+              type: "message",
+              message: parsed.message,
+              username: (ws as any).username,
+            }),
+          );
+        });
+
+        ws.send(
+          JSON.stringify({
+            type: "messageSent",
+          }),
+        );
+      }
+    });
+  });
+
+  app.get("/chat/getMessages", async (req, res) => {
+    let page = parseInt(req.query.page as string) || 1;
+
+    if (page < 1) {
+      page = 1;
+    }
+
+    const messages = await prisma.message.findMany({
+      orderBy: {
+        createdAt: "desc", // keep desc ordering
+      },
+      skip: (page - 1) * 10,
+      take: 10,
+      select: {
+        content: true,
+        author: true,
+        createdAt: true,
+      },
+    });
+
+    res.json(messages);
+  });
+
+  app.get("/chat/whoamI", async (req, res) => {
+    const username = generateUsername(req);
+
+    res.json({
+      username,
+    });
+  });
+}

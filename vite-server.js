@@ -23,6 +23,18 @@ app.use(
 );
 
 app.use(
+  "/chat",
+  createProxyMiddleware({
+    target: "http://localhost:8080/chat/",
+    ws: true,
+    changeOrigin: true,
+    pathRewrite: {
+      "^/chat/": "/",
+    },
+  }),
+);
+
+app.use(
   "/uv/",
   createProxyMiddleware({
     target: "http://localhost:8080/uv/",

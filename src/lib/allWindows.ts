@@ -5,6 +5,7 @@ import Fishing from "../windows/fishGame";
 import MeowCat from "../windows/cat";
 import Settings from "../windows/settings";
 import MusicPlayer from "../windows/musicPlayer";
+import ChatWindow from "../windows/anonChat";
 
 export interface WindowConfig {
   Component: () => {
@@ -41,6 +42,10 @@ export const allWindows: WindowConfig[] = [
   },
   {
     Component: MusicPlayer,
+    showInLaunchpad: true,
+  },
+  {
+    Component: ChatWindow,
     showInLaunchpad: true,
   },
 ];

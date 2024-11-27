@@ -28,7 +28,14 @@ const Shortcut = ({
     <div
       data-shortcut-id={id}
       onClick={() => {
-        Context.CreateWindow(window.element, window.name, icon, window.class, window.minimumSize, window.initialSize);
+        Context.CreateWindow(
+          window.element,
+          window.name,
+          icon,
+          window.class,
+          window.minimumSize,
+          window.initialSize,
+        );
       }}
       className={`flex flex-col items-center w-[74px] h-[74px] rounded hover:bg-blue-500/30 cursor-pointer ${
         isSelected ? "bg-[#C22DC2]/40" : ""
@@ -40,7 +47,6 @@ const Shortcut = ({
           alt={text}
           className="w-full h-full object-contain z-10 pointer-events-none"
           draggable="false"
-          
         />
       </div>
       <span className="text-white text-xs text-center inter leading-tight px-1 mt-1 select-none break-words w-full line-clamp-2">
