@@ -111,11 +111,12 @@ const MainPage = () => {
                 text={windowConfig.Component().name}
                 window={{
                   element: windowConfig.Component().element,
-                  class: windowConfig.Component()
+                  customBackgroundClasses: windowConfig.Component()
                     .customBackgroundClasses as string,
                   name: windowConfig.Component().name,
                   minimumSize: windowConfig.Component().minimumSize,
                   initialSize: windowConfig.Component().initialSize,
+                  hideTopBar: windowConfig.Component().hideTopBar,
                 }}
               />
             </div>

@@ -3,7 +3,7 @@ import { windowProps } from "../components/Windows";
 
 export interface Settings {
   backgroundImage?: string; // as base64 png
-  username?: string; // username for terminal if made
+  username?: string;
   wallpaperPosition?: "center" | "stretch" | "tile";
 }
 export interface Size {
@@ -11,16 +11,43 @@ export interface Size {
   height: number;
 }
 
+export interface WindowComponent {
+  element: ReactElement;
+  name: string;
+  icon?: string;
+  customBackgroundClasses?: string;
+  minimumSize?: Size;
+  initialSize?: Size;
+  hideTopBar?: boolean;
+}
+
+export interface WindowConfig {
+  Component: () => WindowComponent;
+  showInLaunchpad?: boolean;
+}
+
+export interface WindowControls {
+  maximize: () => void;
+  minimize: () => void;
+  close: () => void;
+}
+
+export interface WindowComponentProps {
+  windowControls?: WindowControls;
+  topBarContent?: ReactElement;
+}
+
 export interface AppContextType {
   mainWindow: string;
   setMainWindow: (name: string) => void;
   CreateWindow: (
-    children: ReactElement,
+    children: ReactElement<WindowComponentProps>,
     name: string,
     icon?: string,
     customBackgroundClasses?: string,
     minimumSize?: Size,
     initialSize?: Size,
+    hideTopBar?: boolean,
   ) => void;
   RemoveWindow: (windowId: string) => void;
   windows: ReactElement<windowProps>[];

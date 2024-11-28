@@ -15,12 +15,12 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const CreateWindow = (
     children: ReactElement,
-
     name: string,
     icon?: string,
     customBackgroundClasses?: string,
     minimumSize?: Size,
     initialSize?: Size,
+    hideTopBar?: boolean,
   ) => {
     const windowId = Math.random().toString(36).substring(7);
     const window = (
@@ -32,6 +32,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         customBackgroundClasses={customBackgroundClasses}
         minimumSize={minimumSize}
         initialSize={initialSize}
+        hideTopBar={hideTopBar}
       >
         {children}
       </Window>
