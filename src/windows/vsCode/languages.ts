@@ -9,7 +9,7 @@ const Languages = [
     { name: 'clojure', extensions: ['clj', 'cljs'] },
     { name: 'coffee', extensions: ['coffee', 'cf'] },
     { name: 'cpp', extensions: ['cpp', 'cc', 'cxx', 'hpp', 'h'] },
-    { name: 'csharp', extensions: ['cs'] },
+    { name: 'csharp', extensions: ['cs', 'c#'] }, // no one should use c# but i used to by accident lmao
     { name: 'csp', extensions: ['csp'] },
     { name: 'css', extensions: ['css'] },
     { name: 'cypher', extensions: ['cypher'] },
@@ -65,7 +65,7 @@ const Languages = [
     { name: 'scala', extensions: ['scala', 'sc'] },
     { name: 'scheme', extensions: ['scm', 'ss'] },
     { name: 'scss', extensions: ['scss'] },
-    { name: 'shell', extensions: ['sh', 'bash'] },
+    { name: 'shell', extensions: ['sh', 'bash', 'zsh'] }, // as much as i dont think .zsh gets used, i shall use it.
     { name: 'solidity', extensions: ['sol'] },
     { name: 'sophia', extensions: ['sophia'] },
     { name: 'sparql', extensions: ['sparql'] },
