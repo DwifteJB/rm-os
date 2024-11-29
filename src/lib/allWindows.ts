@@ -40,5 +40,5 @@ export const allWindows: WindowConfig[] = [
   {
     Component: VSCode,
     showInLaunchpad: true,
-  }
+  },
 ];

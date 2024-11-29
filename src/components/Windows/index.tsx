@@ -1,4 +1,12 @@
-import React, { PropsWithChildren, useEffect, useState, useCallback, useContext, useRef, ReactElement } from "react";
+import React, {
+  PropsWithChildren,
+  useEffect,
+  useState,
+  useCallback,
+  useContext,
+  useRef,
+  ReactElement,
+} from "react";
 import { AppContext } from "../mainAppContext";
 
 interface Position {
@@ -37,7 +45,7 @@ const Window = ({
   minimumSize,
   initialSize,
   topBarContent,
-  hideTopBar
+  hideTopBar,
 }: PropsWithChildren<windowProps>) => {
   const Context = useContext(AppContext);
   const [windowPosition, setWindowPosition] = useState<Position>({
@@ -269,9 +277,8 @@ const Window = ({
               )}
               <span className="text-white w-full inter pl-2">{windowName}</span>
             </div>
-            {/* Inject custom top bar content */}
-            {topBarContent && React.cloneElement(topBarContent, { windowControls })}
-            {/* Window controls */}
+            {topBarContent &&
+              React.cloneElement(topBarContent, { windowControls })}
             <div className="flex flex-row items-center">
               <div
                 className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
@@ -306,20 +313,19 @@ const Window = ({
       )}
       {/* Window content */}
       <div
-        className="p-2 overflow-hidden relative"
+        className={`${!hideTopBar && "p-2"} overflow-hidden relative`}
         style={{
           height: hideTopBar ? "100%" : "calc(100% - 2.5rem)",
           zIndex: 1001,
         }}
       >
-        {React.isValidElement(children) && 
+        {React.isValidElement(children) &&
           React.cloneElement<any>(children, {
             ...children.props,
             windowControls,
             onMouseDown: handleMouseDown,
-            onDoubleClick: handleTitleBarDoubleClick
-          })
-        }
+            onDoubleClick: handleTitleBarDoubleClick,
+          })}
       </div>
       {/* Resize handle */}
       {!isMaximized && (
