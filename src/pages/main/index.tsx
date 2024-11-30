@@ -7,10 +7,8 @@ import Shortcut from "../../components/Shortcut";
 import TopBar from "../../components/TopBar";
 
 import AboutWindow from "../../windows/about";
-import MusicPlayer from "../../windows/musicPlayer";
 import { allWindows } from "../../lib/allWindows";
 import MeowCat from "../../windows/cat";
-import ChatWindow from "../../windows/anonChat";
 import VSCode from "../../windows/vsCode";
 
 const MainPage = () => {
