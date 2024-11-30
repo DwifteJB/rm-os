@@ -11,7 +11,6 @@ import * as ws from "ws";
     getHeader(event, "cf-connecting-ip") ||
     getHeader(event, "x-real-ip") ||
     getHeader(event, "x-forwarded-for");
-
 */
 
 // we generate username so its anon!

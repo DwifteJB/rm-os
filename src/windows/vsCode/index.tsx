@@ -1,3 +1,13 @@
+/*
+  todo?
+
+  search: search for text in files
+  saving: save projects in localStorage, might be too much data...?
+  import: import .zip files or folders to work on
+  run: allows running code in javascript context
+
+*/
+
 import React, { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import {
