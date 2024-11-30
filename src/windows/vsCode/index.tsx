@@ -128,7 +128,7 @@ const VSCodeContent = ({
   const renderTabs = () => {
     return openFiles.map((file) => (
       <div
-        key={file.id}
+        key={file.id+file.name}
         className={`h-9 flex items-center px-3 border-r border-[#252526] min-w-[100px] max-w-[200px] cursor-pointer group
           ${activeTab === file.id ? "bg-[#181818]/50" : "bg-[#181818] hover:bg-[#2d2d2d]"}`}
         onClick={() => {
@@ -139,7 +139,7 @@ const VSCodeContent = ({
         <FileText size={16} className="mr-2 shrink-0" />
         <div className="flex-1 flex items-center min-w-0">
           <span
-            className={`inter truncate text-sm ${activeTab === file.id ? "text-white" : "text-gray-500"} ${fileErrors[file.id] > 0 ? "text-red-500" : "text-[#cccccc]"}`}
+            className={`inter truncate text-sm ${fileErrors[file.id] > 0 ? "text-red-500" : activeTab === file.id ? "text-white" : "text-gray-500"}`}
           >
             {file.name}
           </span>
@@ -237,7 +237,7 @@ const VSCodeContent = ({
       id: Math.random().toString(),
       name: finalName,
       type: createType,
-      content: createType === "file" ? "// Write your code here" : undefined,
+      content: createType === "file" ? "" : undefined,
       children: createType === "folder" ? [] : undefined,
       isOpen: false,
       language,
@@ -357,7 +357,7 @@ const VSCodeContent = ({
       const hasError = fileErrors[node.id] > 0;
 
       return (
-        <div key={node.id} className="ml-4">
+        <div key={node.id+node.name} className="ml-4">
           <div
             className={`flex items-center py-1 px-2 hover:bg-[#37373d] cursor-pointer ${
               activeFile?.id === node.id || isSelected ? "bg-[#fff]/5" : ""
@@ -419,11 +419,18 @@ const VSCodeContent = ({
     if (infoFile) {
       handleFileClick(infoFile);
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // only want it to run once to open info.txt 
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <div className="absolute bg-[#222222] hidden rounded-md border p-2 border-[#313131] w-[70%] z-[100] text-white text-center items-center justify-center">
+      <div className="absolute bg-[#222222] rounded-md border p-2 border-[#313131] w-[70%] z-[300] text-white text-center items-center justify-center" style={{
+        top: "12%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        display:"none"
+        
+      }}>
         <input className="w-full placeholder-white rounded-md bg-[#313131] inter text-white p-1 focus:outline-none focus:ring-1" />
       </div>
       {/* title bar */}
@@ -542,9 +549,9 @@ const VSCodeContent = ({
                         ref={suggestionRef}
                         className="absolute top-full left-0 w-full mt-1 bg-[#252526] border border-[#3c3c3c] rounded shadow-lg z-50 max-h-48 overflow-y-auto"
                       >
-                        {languageSuggestions.map((suggestion, index) => (
+                        {languageSuggestions.map((suggestion) => (
                           <div
-                            key={index}
+                            key={suggestion.name}
                             className="px-2 py-1 hover:bg-[#37373d] cursor-pointer text-[#cccccc] text-sm"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
