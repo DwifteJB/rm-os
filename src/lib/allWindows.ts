@@ -1,23 +1,12 @@
 import AboutWindow from "../windows/about";
 import Browser from "../windows/browser";
-import type { Size } from "../types";
+import type { WindowConfig } from "../types";
 import Fishing from "../windows/fishGame";
 import MeowCat from "../windows/cat";
 import Settings from "../windows/settings";
 import MusicPlayer from "../windows/musicPlayer";
 import ChatWindow from "../windows/anonChat";
-
-export interface WindowConfig {
-  Component: () => {
-    element: JSX.Element;
-    name: string;
-    icon?: string;
-    customBackgroundClasses?: string;
-    minimumSize?: Size;
-    initialSize?: Size;
-  };
-  showInLaunchpad?: boolean;
-}
+import VSCode from "../windows/vsCode";
 
 export const allWindows: WindowConfig[] = [
   {
@@ -46,6 +35,10 @@ export const allWindows: WindowConfig[] = [
   },
   {
     Component: ChatWindow,
+    showInLaunchpad: true,
+  },
+  {
+    Component: VSCode,
     showInLaunchpad: true,
   },
 ];

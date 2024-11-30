@@ -1,10 +1,11 @@
-import {
+import React, {
   PropsWithChildren,
   useEffect,
   useState,
   useCallback,
   useContext,
   useRef,
+  ReactElement,
 } from "react";
 import { AppContext } from "../mainAppContext";
 
@@ -30,6 +31,9 @@ export interface windowProps {
   initialSize?: Size;
   minimumSize?: Size;
   icon?: string;
+  topBarContent?: ReactElement;
+  hideTopBar?: boolean;
+  children: ReactElement;
 }
 
 const Window = ({
@@ -40,6 +44,8 @@ const Window = ({
   icon,
   minimumSize,
   initialSize,
+  topBarContent,
+  hideTopBar,
 }: PropsWithChildren<windowProps>) => {
   const Context = useContext(AppContext);
   const [windowPosition, setWindowPosition] = useState<Position>({
@@ -216,6 +222,12 @@ const Window = ({
     };
   }, [isDragging, isResizing, handleMouseMove, handleMouseUp]);
 
+  const windowControls = {
+    maximize,
+    minimize: () => Context.toggleWindowVisibility(id),
+    close: () => Context.RemoveWindow(id),
+  };
+
   return (
     <div
       className={`${customBackgroundClasses} ${Context.mainWindow === id ? "border-solid border-2" : "border-dotted border-2"} rounded-md border-[#474747] absolute
@@ -243,77 +255,77 @@ const Window = ({
       }}
     >
       {/* top bar background */}
-      <div
-        className={`h-10 w-full rounded-t-md cursor-grab relative bg-[#1f1e24]/50
-          ${isDragging ? "cursor-grabbing" : ""}
-          ${isMaximized ? "rounded-none" : ""}`}
-        onMouseDown={handleMouseDown}
-        onDoubleClick={handleTitleBarDoubleClick}
-        style={{
-          zIndex: 1002,
-        }}
-      >
-        {/* Title bar content */}
+      {!hideTopBar && (
         <div
-          className="flex flex-row items-center w-full h-full pr-2"
+          className={`h-10 w-full rounded-t-md cursor-grab relative bg-[#1f1e24]/50
+            ${isDragging ? "cursor-grabbing" : ""}
+            ${isMaximized ? "rounded-none" : ""}`}
+          onMouseDown={handleMouseDown}
+          onDoubleClick={handleTitleBarDoubleClick}
           style={{
-            position: "relative",
-            zIndex: 1003,
+            zIndex: 1002,
           }}
         >
-          <div className="flex flex-row items-center w-full ml-2">
-            {icon && (
-              <>
-                <img src={icon} className="w-4 h-4" alt={windowName} />
-                <div className="w-6 h-6 absolute" />
-              </>
-            )}
-            <span className="text-white w-full inter pl-2">{windowName}</span>
-          </div>
-          {/* right side (minimize, maximize and close buttons) */}
-          <div className="flex flex-row items-center justify-end w-full">
-            {/* Minimize button */}
-            <div
-              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                Context.toggleWindowVisibility(id);
-              }}
-            >
-              _
+          {/* Title bar content */}
+          <div className="flex flex-row items-center w-full h-full pr-2">
+            <div className="flex flex-row items-center w-full ml-2">
+              {icon && (
+                <>
+                  <img src={icon} className="w-4 h-4" alt={windowName} />
+                  <div className="w-6 h-6 absolute" />
+                </>
+              )}
+              <span className="text-white w-full inter pl-2">{windowName}</span>
             </div>
-            {/* Maximize button */}
-            <div
-              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                maximize();
-              }}
-            >
-              {isMaximized ? "❐" : "❏"}
-            </div>
-            {/* Close button */}
-            <div
-              className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                Context.RemoveWindow(id);
-              }}
-            >
-              ✕
+            {topBarContent &&
+              React.cloneElement(topBarContent, { windowControls })}
+            <div className="flex flex-row items-center">
+              <div
+                className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  Context.toggleWindowVisibility(id);
+                }}
+              >
+                _
+              </div>
+              <div
+                className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  maximize();
+                }}
+              >
+                {isMaximized ? "❐" : "❏"}
+              </div>
+              <div
+                className="w-6 h-6 mr-1 flex justify-center items-center text-center cursor-pointer text-white"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  Context.RemoveWindow(id);
+                }}
+              >
+                ✕
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
       {/* Window content */}
       <div
-        className="p-2 overflow-hidden relative"
+        className={`${!hideTopBar && "p-2"} overflow-hidden relative`}
         style={{
-          height: "calc(100% - 2.5rem)",
+          height: hideTopBar ? "100%" : "calc(100% - 2.5rem)",
           zIndex: 1001,
         }}
       >
-        {children}
+        {React.isValidElement(children) &&
+          React.cloneElement<any>(children, {
+            ...children.props,
+            windowControls,
+            onMouseDown: handleMouseDown,
+            onDoubleClick: handleTitleBarDoubleClick,
+          })}
       </div>
       {/* Resize handle */}
       {!isMaximized && (

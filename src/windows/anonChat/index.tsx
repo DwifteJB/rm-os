@@ -72,7 +72,6 @@ const ChatPage = () => {
           username: msg.author,
         })),
         ...prevMessages,
-
       ]);
     } catch (error) {
       console.error("Failed to fetch messages:", error);

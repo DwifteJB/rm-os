@@ -20,6 +20,7 @@ const LaunchPad = ({
       windowData.customBackgroundClasses,
       windowData.minimumSize,
       windowData.initialSize,
+      windowData.hideTopBar,
     );
     setIsOpen(false);
   };

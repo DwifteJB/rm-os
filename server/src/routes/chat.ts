@@ -11,13 +11,16 @@ import * as ws from "ws";
     getHeader(event, "cf-connecting-ip") ||
     getHeader(event, "x-real-ip") ||
     getHeader(event, "x-forwarded-for");
-
 */
 
 // we generate username so its anon!
 const generateUsername = (req: express.Request) => {
   const userAgent = req.headers["user-agent"] || "unknown";
-  const ip = req.headers["CF-Connecting-IP"] || req.headers["x-real-ip"] || req.headers["x-forwarded-for"] || "unknown";
+  const ip =
+    req.headers["CF-Connecting-IP"] ||
+    req.headers["x-real-ip"] ||
+    req.headers["x-forwarded-for"] ||
+    "unknown";
   const uniqueString = `${ip}-${userAgent}`;
   const username = crypto
     .createHash("md5")
@@ -108,7 +111,7 @@ export default function ChatRoutes(
 
     const messages = await prisma.message.findMany({
       orderBy: {
-        createdAt: "desc", 
+        createdAt: "desc",
       },
       skip: (page - 1) * 10,
       take: 10,

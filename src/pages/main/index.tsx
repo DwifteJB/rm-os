@@ -7,16 +7,14 @@ import Shortcut from "../../components/Shortcut";
 import TopBar from "../../components/TopBar";
 
 import AboutWindow from "../../windows/about";
-import MusicPlayer from "../../windows/musicPlayer";
 import { allWindows } from "../../lib/allWindows";
 import MeowCat from "../../windows/cat";
-import ChatWindow from "../../windows/anonChat";
+import VSCode from "../../windows/vsCode";
 
 const MainPage = () => {
   const Context = useContext(AppContext);
   const [hasMadeFirstRender, setHasMadeFirstRender] = useState(false);
   const [hasMadeSecondRender, setHasMadeSecondRender] = useState(false);
-  const [hasMadeThirdRender, setHasMadeThirdRender] = useState(false);
 
   useEffect(() => {
     const abt = AboutWindow();
@@ -34,15 +32,16 @@ const MainPage = () => {
 
   useEffect(() => {
     if (!hasMadeFirstRender) return;
-    const music = MusicPlayer();
+    const code = VSCode();
 
     Context.CreateWindow(
-      music.element,
-      music.name,
-      music.icon,
-      music.customBackgroundClasses,
-      music.minimumSize,
-      music.initialSize,
+      code.element,
+      code.name,
+      code.icon,
+      code.customBackgroundClasses,
+      code.minimumSize,
+      code.initialSize,
+      code.hideTopBar
     );
     setHasMadeSecondRender(true);
   }, [hasMadeFirstRender]);
@@ -60,23 +59,7 @@ const MainPage = () => {
       cat.minimumSize,
       cat.initialSize,
     );
-    setHasMadeThirdRender(true);
   }, [hasMadeSecondRender]);
-
-  useEffect(() => {
-    if (!hasMadeFirstRender) return;
-
-    const chat = ChatWindow();
-
-    Context.CreateWindow(
-      chat.element,
-      chat.name,
-      chat.icon,
-      chat.customBackgroundClasses,
-      chat.minimumSize,
-      chat.initialSize,
-    );
-  }, [hasMadeThirdRender]);
 
   if (Context.loading.loading) {
     return <BootSequence />;
@@ -111,11 +94,12 @@ const MainPage = () => {
                 text={windowConfig.Component().name}
                 window={{
                   element: windowConfig.Component().element,
-                  class: windowConfig.Component()
+                  customBackgroundClasses: windowConfig.Component()
                     .customBackgroundClasses as string,
                   name: windowConfig.Component().name,
                   minimumSize: windowConfig.Component().minimumSize,
                   initialSize: windowConfig.Component().initialSize,
+                  hideTopBar: windowConfig.Component().hideTopBar,
                 }}
               />
             </div>
