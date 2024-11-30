@@ -1,3 +1,16 @@
+import {
+  FileJson,
+  FileType,
+  FileCode,
+  FileText,
+  File,
+
+  FileTerminal,
+  FileCog,
+  LucideIcon,
+} from 'lucide-react';
+
+
 // https://github.com/microsoft/monaco-editor/tree/main/src/basic-languages languages
 const Languages = [
   { name: "abap", extensions: ["abap"] },
@@ -119,3 +132,30 @@ export const getLanguageExtensionsFromName = (
 };
 
 export default Languages;
+
+
+const languageCategories = {
+  markup: ['html', 'xml', 'markdown', 'mdx', 'pug', 'handlebars'],
+  style: ['css', 'scss', 'less'],
+  script: ['javascript', 'typescript', 'python', 'ruby', 'perl', 'lua', 'shell'],
+  data: ['json', 'yaml', 'sql', 'mysql', 'pgsql'],
+  system: ['dockerfile', 'ini', 'bat', 'powershell'],
+  compiled: ['rust', 'go', 'cpp', 'csharp', 'java', 'kotlin', 'swift'],
+};
+
+export const getIconForFile = (filename: string): LucideIcon => {
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (!extension) return File;
+
+  const language = getLanguageNameFromExtension(extension);
+  if (!language) return FileText;
+
+  if (languageCategories.markup.includes(language)) return FileCode;
+  if (languageCategories.style.includes(language)) return FileType;
+  if (languageCategories.script.includes(language)) return FileCode;
+  if (languageCategories.data.includes(language)) return FileJson;
+  if (languageCategories.system.includes(language)) return FileTerminal;
+  if (languageCategories.compiled.includes(language)) return FileCog;
+
+  return FileText;
+};

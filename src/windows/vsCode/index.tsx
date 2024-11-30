@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import {
   File as FileIcon,
@@ -10,12 +10,11 @@ import {
   ChevronDown,
   Plus,
   Folder,
-  FileText,
   X,
   Download,
   Trash,
 } from "lucide-react";
-import Languages, { getLanguageNameFromExtension } from "./languages";
+import Languages, { getIconForFile, getLanguageNameFromExtension } from "./languages";
 import { WindowComponentProps } from "../../types";
 import JSZip from "jszip";
 
@@ -136,7 +135,10 @@ const VSCodeContent = ({
           setActiveFile(file);
         }}
       >
-        <FileText size={16} className="mr-2 shrink-0" />
+        {React.createElement(getIconForFile(file.name), { 
+        size: 16, 
+        className: "mr-2 shrink-0" 
+      })}
         <div className="flex-1 flex items-center min-w-0">
           <span
             className={`inter truncate text-sm ${fileErrors[file.id] > 0 ? "text-red-500" : activeTab === file.id ? "text-white" : "text-gray-500"}`}
@@ -324,7 +326,11 @@ const VSCodeContent = ({
         return node;
       });
     };
-
+  
+    if (selectedFolder.includes(id)) {
+      setSelectedFolder([]);
+    }
+  
     setFileSystem(updatedFileSystem(fileSystem, selectedFolder));
     setOpenFiles((prev) => prev.filter((f) => f.id !== id));
     setFileErrors((prev) => {
@@ -332,7 +338,7 @@ const VSCodeContent = ({
       delete newErrors[id];
       return newErrors;
     });
-  }
+  };
 
   const closeTab = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -356,8 +362,10 @@ const VSCodeContent = ({
       const isSelected = selectedFolder.join(".") === currentPath.join(".");
       const hasError = fileErrors[node.id] > 0;
 
+      const FileIcon = node.type === "folder" ? Folder : getIconForFile(node.name);
+
       return (
-        <div key={node.id+node.name} className="ml-4">
+        <div key={node.id} className="ml-4">
           <div
             className={`flex items-center py-1 px-2 hover:bg-[#37373d] cursor-pointer ${
               activeFile?.id === node.id || isSelected ? "bg-[#fff]/5" : ""
@@ -381,11 +389,7 @@ const VSCodeContent = ({
             ) : (
               <div className="w-4" />
             )}
-            {node.type === "folder" ? (
-              <Folder size={16} className="mr-2" />
-            ) : (
-              <FileText size={16} className="mr-2" />
-            )}
+            <FileIcon size={16} className="mr-2" />
             <div className="flex justify-between items-center w-full">
               <span className={`text-sm ${hasError ? "text-red-500" : ""}`}>
                 {node.name}
@@ -549,9 +553,9 @@ const VSCodeContent = ({
                         ref={suggestionRef}
                         className="absolute top-full left-0 w-full mt-1 bg-[#252526] border border-[#3c3c3c] rounded shadow-lg z-50 max-h-48 overflow-y-auto"
                       >
-                        {languageSuggestions.map((suggestion) => (
+                        {languageSuggestions.map((suggestion, index) => (
                           <div
-                            key={suggestion.name}
+                            key={suggestion.name+index}
                             className="px-2 py-1 hover:bg-[#37373d] cursor-pointer text-[#cccccc] text-sm"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
