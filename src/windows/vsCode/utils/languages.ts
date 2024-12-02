@@ -4,12 +4,10 @@ import {
   FileCode,
   FileText,
   File,
-
   FileTerminal,
   FileCog,
   LucideIcon,
-} from 'lucide-react';
-
+} from "lucide-react";
 
 // https://github.com/microsoft/monaco-editor/tree/main/src/basic-languages languages
 const Languages = [
@@ -133,18 +131,25 @@ export const getLanguageExtensionsFromName = (
 
 export default Languages;
 
-
 const languageCategories = {
-  markup: ['html', 'xml', 'markdown', 'mdx', 'pug', 'handlebars'],
-  style: ['css', 'scss', 'less'],
-  script: ['javascript', 'typescript', 'python', 'ruby', 'perl', 'lua', 'shell'],
-  data: ['json', 'yaml', 'sql', 'mysql', 'pgsql'],
-  system: ['dockerfile', 'ini', 'bat', 'powershell'],
-  compiled: ['rust', 'go', 'cpp', 'csharp', 'java', 'kotlin', 'swift'],
+  markup: ["html", "xml", "markdown", "mdx", "pug", "handlebars"],
+  style: ["css", "scss", "less"],
+  script: [
+    "javascript",
+    "typescript",
+    "python",
+    "ruby",
+    "perl",
+    "lua",
+    "shell",
+  ],
+  data: ["json", "yaml", "sql", "mysql", "pgsql"],
+  system: ["dockerfile", "ini", "bat", "powershell"],
+  compiled: ["rust", "go", "cpp", "csharp", "java", "kotlin", "swift"],
 };
 
 export const getIconForFile = (filename: string): LucideIcon => {
-  const extension = filename.split('.').pop()?.toLowerCase();
+  const extension = filename.split(".").pop()?.toLowerCase();
   if (!extension) return File;
 
   const language = getLanguageNameFromExtension(extension);

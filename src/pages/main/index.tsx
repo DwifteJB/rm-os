@@ -41,7 +41,7 @@ const MainPage = () => {
       code.customBackgroundClasses,
       code.minimumSize,
       code.initialSize,
-      code.hideTopBar
+      code.hideTopBar,
     );
     setHasMadeSecondRender(true);
   }, [hasMadeFirstRender]);
