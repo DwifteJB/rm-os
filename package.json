@@ -38,6 +38,7 @@
     "react-hot-toast": "^2.4.1",
     "react-simple-animate": "^3.5.2",
     "react-tiny-popover": "^8.1.2",
+    "react-tooltip": "^5.28.0",
     "tailwindcss": "^3.4.14",
     "three": "^0.170.0",
     "tsx": "^4.19.2",
