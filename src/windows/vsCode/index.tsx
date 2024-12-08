@@ -8,9 +8,9 @@
 
 */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import Editor from "@monaco-editor/react";
-import { File as FileIcon, Search, Download } from "lucide-react";
+import { File as FileIcon, Search, Download, PlayCircle } from "lucide-react";
 
 import { WindowComponentProps } from "../../types";
 import { FileSystemNode, OpenFile } from "./types";
@@ -24,6 +24,8 @@ import FileSystemImport from "./panels/ImportFile";
 
 import { findFileRecursively } from "./utils/utils";
 import useCodeMethods from "./utils/useCodeMethods";
+import { AppContext } from "../../components/mainAppContext";
+import CodeRunner from "./Coderunner";
 
 const VSCodeContent = ({
   windowControls,
@@ -35,6 +37,7 @@ const VSCodeContent = ({
 }) => {
   const [showSidebar, setShowSidebar] = useState("");
   const [activeFile, setActiveFile] = useState<FileSystemNode | null>(null);
+  const [fileContent, setFileContent] = useState<string>('');
   const [selectedFolder, setSelectedFolder] = useState<string[]>([]);
   const [fileSystem, setFileSystem] = useState<FileSystemNode[]>([
     {
@@ -56,15 +59,63 @@ const VSCodeContent = ({
       id: "3",
       name: "info.txt",
       type: "file",
-      isOpen: true,
       content:
         "// Welcome to rmcode, you can create a new file with the + in the explorer, by adding a . it will automagically suggest a language for you\n\n// Press the download button to export the project as a .zip!",
     },
+    {
+      id: "4",
+      name: "index.html",
+      type: "file",
+      content: "<h1>Hello World</h1>\n\n<script>\n  console.log('hello world')\n</script>",
+      isOpen: false,
+    }
   ]);
 
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [fileErrors, setFileErrors] = useState<{ [key: string]: number }>({});
+
+  const context = useContext(AppContext);
+
+  const getLanguageFromFilename = (filename: string): string => {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    if (ext === 'js') return 'javascript';
+    if (ext === 'html') return 'html';
+    return 'plaintext';
+  };
+
+  const isRunnableFile = (file: FileSystemNode | null) => {
+    if (!file) return false;
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    return ext === 'js' || ext === 'html' || file.language === 'javascript' || file.language === 'html';
+  };
+
+  const handleRunCode = useCallback(() => {
+    if (!activeFile) return;
+    
+    const fileName = activeFile.name;
+    const windowName = `Output: ${fileName}`;
+    
+    context.CreateWindow(
+      <CodeRunner
+        code={fileContent}
+        language={activeFile.language || getLanguageFromFilename(fileName)}
+        fileSystem={fileSystem}
+        currentFileId={activeFile.id}
+      />,
+      windowName,
+      '/code.png',
+      '',
+      { width: 400, height: 300 },
+      { width: 500, height: 400 }
+    );
+  }, [activeFile, fileContent, fileSystem, context]);
+
+  useEffect(() => {
+    if (activeFile) {
+      setFileContent(activeFile.content || '');
+    }
+  }, [activeFile]);
 
   const {
     deleteFile,
@@ -88,13 +139,6 @@ const VSCodeContent = ({
     setSelectedFolder,
     setFileSystem,
   });
-
-  useEffect(() => {
-    const infoFile = fileSystem.find((node) => node.name === "info.txt");
-    if (infoFile) {
-      handleFileClick(infoFile);
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
@@ -273,6 +317,19 @@ const VSCodeContent = ({
             className={`flex-none h-9 bg-[#252526] flex items-center overflow-x-auto ${openFiles.length == 0 && "hidden"}`}
           >
             {renderTabs()}
+            {isRunnableFile(activeFile) && (
+              <div className="flex-none px-2 border-l border-[#3c3c3c]">
+                <div 
+                  className="p-1 hover:bg-[#3c3c3c] rounded cursor-pointer group"
+                  onClick={handleRunCode}
+                >
+                  <PlayCircle 
+                    size={20} 
+                    className="text-gray-400 group-hover:text-white"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex-1 relative min-h-0">
@@ -284,61 +341,61 @@ const VSCodeContent = ({
               </div>
             )}
             <Editor
-              className={`${openFiles.length === 0 ? "hidden" : ""}`}
-              height="100%"
-              defaultLanguage="typescript"
-              language={activeFile?.language || "plaintext"}
-              theme="vs-dark"
-              value={activeFile?.content || ""}
-              onChange={(value) => {
-                if (activeFile) {
-                  const updatedFileSystem = (
-                    nodes: FileSystemNode[],
-                  ): FileSystemNode[] => {
-                    return nodes.map((node) => {
-                      if (node.id === activeFile.id) {
-                        return { ...node, content: value || "" };
-                      }
-                      if (node.children) {
-                        return {
-                          ...node,
-                          children: updatedFileSystem(node.children),
-                        };
-                      }
-                      return node;
-                    });
-                  };
+          className={`${openFiles.length === 0 ? "hidden" : ""}`}
+          height="100%"
+          defaultLanguage="typescript"
+          language={activeFile?.language || "plaintext"}
+          theme="vs-dark"
+          value={fileContent}
+          onChange={(value) => {
+            setFileContent(value || '');
+            if (activeFile) {
+              const updatedFileSystem = (
+                nodes: FileSystemNode[],
+              ): FileSystemNode[] => {
+                return nodes.map((node) => {
+                  if (node.id === activeFile.id) {
+                    return { ...node, content: value || "" };
+                  }
+                  if (node.children) {
+                    return {
+                      ...node,
+                      children: updatedFileSystem(node.children),
+                    };
+                  }
+                  return node;
+                });
+              };
 
-                  setFileSystem(updatedFileSystem(fileSystem));
-                  setOpenFiles((prev) =>
-                    prev.map((f) =>
-                      f.id === activeFile.id
-                        ? { ...f, content: value || "", isDirty: true }
-                        : f,
-                    ),
-                  );
-                }
-              }}
-              onValidate={(markers) => {
-                if (activeFile) {
-                  setFileErrors((prev) => ({
-                    ...prev,
-                    [activeFile.id]: markers.filter(
-                      (marker) => marker.severity === 8,
-                    ).length,
-                  }));
-                }
-              }}
-              options={{
-                minimap: { enabled: true },
-                scrollbar: {
-                  vertical: "visible",
-                  horizontal: "visible",
-                },
-                fontSize: 14,
-                lineNumbers: "on",
-              }}
-            />
+              setFileSystem(updatedFileSystem(fileSystem));
+              setOpenFiles((prev) =>
+                prev.map((f) =>
+                  f.id === activeFile.id
+                    ? { ...f, content: value || "", isDirty: true }
+                    : f,
+                ),
+              );
+            }}}
+          onValidate={(markers) => {
+            if (activeFile) {
+              setFileErrors((prev) => ({
+                ...prev,
+                [activeFile.id]: markers.filter(
+                  (marker) => marker.severity === 8,
+                ).length,
+              }));
+            }
+          }}
+          options={{
+            minimap: { enabled: true },
+            scrollbar: {
+              vertical: "visible",
+              horizontal: "visible",
+            },
+            fontSize: 14,
+            lineNumbers: "on",
+          }}
+        />
           </div>
         </div>
       </div>
