@@ -24,8 +24,10 @@ import FileSystemImport from "./panels/ImportFile";
 
 import { findFileRecursively } from "./utils/utils";
 import useCodeMethods from "./utils/useCodeMethods";
+
 import { AppContext } from "../../components/mainAppContext";
 import CodeRunner from "./Coderunner";
+
 
 const VSCodeContent = ({
   windowControls,
@@ -396,6 +398,7 @@ const VSCodeContent = ({
             lineNumbers: "on",
           }}
         />
+
           </div>
         </div>
       </div>
