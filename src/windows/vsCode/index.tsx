@@ -12,6 +12,7 @@ import React, { useState, useEffect, useContext, useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import { File as FileIcon, Search, Download, PlayCircle } from "lucide-react";
 
+
 import { WindowComponentProps } from "../../types";
 import { FileSystemNode, OpenFile } from "./types";
 
@@ -24,8 +25,10 @@ import FileSystemImport from "./panels/ImportFile";
 
 import { findFileRecursively } from "./utils/utils";
 import useCodeMethods from "./utils/useCodeMethods";
+
 import { AppContext } from "../../components/mainAppContext";
 import CodeRunner from "./Coderunner";
+
 
 const VSCodeContent = ({
   windowControls,
@@ -396,6 +399,7 @@ const VSCodeContent = ({
             lineNumbers: "on",
           }}
         />
+
           </div>
         </div>
       </div>
