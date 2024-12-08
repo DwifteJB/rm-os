@@ -60,6 +60,7 @@ const VSCodeContent = ({
     {
       id: "3",
       name: "info.txt",
+      language: "plaintext",
       type: "file",
       content:
         "// Welcome to rmcode, you can create a new file with the + in the explorer, by adding a . it will automagically suggest a language for you\n\n// Press the download button to export the project as a .zip!",
@@ -67,9 +68,17 @@ const VSCodeContent = ({
     {
       id: "4",
       name: "index.html",
+      language: "html",
       type: "file",
-      content: "<h1>Hello World</h1>\n\n<script>\n  console.log('hello world')\n</script>",
+      content: "<h1>Hello World</h1>\n\n<script>\n  console.log('hello world')\n</script> <script src='index.js'></script>",
       isOpen: false,
+    },
+    {
+      id: "5",
+      name: "index.js",
+      language: "javascript",
+      type: "file",
+      content: "console.log('hello world but from index.js file')",
     }
   ]);
 
