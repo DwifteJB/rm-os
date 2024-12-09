@@ -2,9 +2,9 @@
   todo?
 
   search: search for text in files (done!)
-  saving: save projects in localStorage, might be too much data...?
+  saving: save projects in localStorage, might be too much data...? will explore this latah
   import: import .zip files or folders to work on (done kinda not zip!)
-  run: allows running code in javascript context
+  run: allows running code in javascript context (done! and python!!)
 
 */
 
@@ -28,7 +28,6 @@ import useCodeMethods from "./utils/useCodeMethods";
 import { AppContext } from "../../components/mainAppContext";
 import CodeRunner from "./Coderunner";
 
-
 const VSCodeContent = ({
   windowControls,
   onMouseDown,
@@ -39,7 +38,7 @@ const VSCodeContent = ({
 }) => {
   const [showSidebar, setShowSidebar] = useState("");
   const [activeFile, setActiveFile] = useState<FileSystemNode | null>(null);
-  const [fileContent, setFileContent] = useState<string>('');
+  const [fileContent, setFileContent] = useState<string>("");
   const [selectedFolder, setSelectedFolder] = useState<string[]>([]);
   const [fileSystem, setFileSystem] = useState<FileSystemNode[]>([
     {
@@ -70,7 +69,8 @@ const VSCodeContent = ({
       name: "index.html",
       language: "html",
       type: "file",
-      content: "<h1>Hello World</h1>\n\n<script>\n  console.log('hello world')\n</script> <script src='index.js'></script>",
+      content:
+        "<h1>Hello World</h1>\n\n<script>\n  console.log('hello world')\n</script> <script src='index.js'></script>",
       isOpen: false,
     },
     {
@@ -79,7 +79,14 @@ const VSCodeContent = ({
       language: "javascript",
       type: "file",
       content: "console.log('hello world but from index.js file')",
-    }
+    },
+    {
+      id: "6",
+      name: "main.py",
+      language: "python",
+      type: "file",
+      content: `import math\ndef calculate_circle_area(radius):\n    return math.pi * radius ** 2\n\nradius = 5\narea = calculate_circle_area(radius)\nprint(f"The area of a circle with radius {radius} is {area:.2f}")`,
+    },
   ]);
 
   const [openFiles, setOpenFiles] = useState<OpenFile[]>([]);
@@ -89,24 +96,32 @@ const VSCodeContent = ({
   const context = useContext(AppContext);
 
   const getLanguageFromFilename = (filename: string): string => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-    if (ext === 'js') return 'javascript';
-    if (ext === 'html') return 'html';
-    return 'plaintext';
+    const ext = filename.split(".").pop()?.toLowerCase();
+    if (ext === "js") return "javascript";
+    if (ext === "html") return "html";
+    if (ext === "py") return "python";
+    return "plaintext";
   };
 
   const isRunnableFile = (file: FileSystemNode | null) => {
     if (!file) return false;
-    const ext = file.name.split('.').pop()?.toLowerCase();
-    return ext === 'js' || ext === 'html' || file.language === 'javascript' || file.language === 'html';
+    const ext = file.name.split(".").pop()?.toLowerCase();
+    return (
+      ext === "js" ||
+      ext === "html" ||
+      ext === "py" ||
+      file.language === "javascript" ||
+      file.language === "html" ||
+      file.language === "python"
+    );
   };
 
   const handleRunCode = useCallback(() => {
     if (!activeFile) return;
-    
+
     const fileName = activeFile.name;
     const windowName = `Output: ${fileName}`;
-    
+
     context.CreateWindow(
       <CodeRunner
         code={fileContent}
@@ -115,16 +130,16 @@ const VSCodeContent = ({
         currentFileId={activeFile.id}
       />,
       windowName,
-      '/code.png',
-      '',
+      "/code.png",
+      "",
       { width: 400, height: 300 },
-      { width: 500, height: 400 }
+      { width: 500, height: 400 },
     );
   }, [activeFile, fileContent, fileSystem, context]);
 
   useEffect(() => {
     if (activeFile) {
-      setFileContent(activeFile.content || '');
+      setFileContent(activeFile.content || "");
     }
   }, [activeFile]);
 
@@ -330,12 +345,12 @@ const VSCodeContent = ({
             {renderTabs()}
             {isRunnableFile(activeFile) && (
               <div className="flex-none px-2 border-l border-[#3c3c3c]">
-                <div 
+                <div
                   className="p-1 hover:bg-[#3c3c3c] rounded cursor-pointer group"
                   onClick={handleRunCode}
                 >
-                  <PlayCircle 
-                    size={20} 
+                  <PlayCircle
+                    size={20}
                     className="text-gray-400 group-hover:text-white"
                   />
                 </div>
@@ -352,62 +367,62 @@ const VSCodeContent = ({
               </div>
             )}
             <Editor
-          className={`${openFiles.length === 0 ? "hidden" : ""}`}
-          height="100%"
-          defaultLanguage="typescript"
-          language={activeFile?.language || "plaintext"}
-          theme="vs-dark"
-          value={fileContent}
-          onChange={(value) => {
-            setFileContent(value || '');
-            if (activeFile) {
-              const updatedFileSystem = (
-                nodes: FileSystemNode[],
-              ): FileSystemNode[] => {
-                return nodes.map((node) => {
-                  if (node.id === activeFile.id) {
-                    return { ...node, content: value || "" };
-                  }
-                  if (node.children) {
-                    return {
-                      ...node,
-                      children: updatedFileSystem(node.children),
-                    };
-                  }
-                  return node;
-                });
-              };
+              className={`${openFiles.length === 0 ? "hidden" : ""}`}
+              height="100%"
+              defaultLanguage="typescript"
+              language={activeFile?.language || "plaintext"}
+              theme="vs-dark"
+              value={fileContent}
+              onChange={(value) => {
+                setFileContent(value || "");
+                if (activeFile) {
+                  const updatedFileSystem = (
+                    nodes: FileSystemNode[],
+                  ): FileSystemNode[] => {
+                    return nodes.map((node) => {
+                      if (node.id === activeFile.id) {
+                        return { ...node, content: value || "" };
+                      }
+                      if (node.children) {
+                        return {
+                          ...node,
+                          children: updatedFileSystem(node.children),
+                        };
+                      }
+                      return node;
+                    });
+                  };
 
-              setFileSystem(updatedFileSystem(fileSystem));
-              setOpenFiles((prev) =>
-                prev.map((f) =>
-                  f.id === activeFile.id
-                    ? { ...f, content: value || "", isDirty: true }
-                    : f,
-                ),
-              );
-            }}}
-          onValidate={(markers) => {
-            if (activeFile) {
-              setFileErrors((prev) => ({
-                ...prev,
-                [activeFile.id]: markers.filter(
-                  (marker) => marker.severity === 8,
-                ).length,
-              }));
-            }
-          }}
-          options={{
-            minimap: { enabled: true },
-            scrollbar: {
-              vertical: "visible",
-              horizontal: "visible",
-            },
-            fontSize: 14,
-            lineNumbers: "on",
-          }}
-        />
-
+                  setFileSystem(updatedFileSystem(fileSystem));
+                  setOpenFiles((prev) =>
+                    prev.map((f) =>
+                      f.id === activeFile.id
+                        ? { ...f, content: value || "", isDirty: true }
+                        : f,
+                    ),
+                  );
+                }
+              }}
+              onValidate={(markers) => {
+                if (activeFile) {
+                  setFileErrors((prev) => ({
+                    ...prev,
+                    [activeFile.id]: markers.filter(
+                      (marker) => marker.severity === 8,
+                    ).length,
+                  }));
+                }
+              }}
+              options={{
+                minimap: { enabled: true },
+                scrollbar: {
+                  vertical: "visible",
+                  horizontal: "visible",
+                },
+                fontSize: 14,
+                lineNumbers: "on",
+              }}
+            />
           </div>
         </div>
       </div>

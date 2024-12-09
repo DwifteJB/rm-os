@@ -43,7 +43,7 @@ const SettingsElement = () => {
       </div>
 
       <div className="space-y-4">
-        <div>
+        {/* <div>
           <label className="block mb-2 inter">Username</label>
           <input
             type="text"
@@ -56,7 +56,7 @@ const SettingsElement = () => {
             }
             className="bg-[#C22DC2]/50 p-2 rounded w-full"
           />
-        </div>
+        </div> unused atm */}
 
         <div>
           <label className="block mb-2 inter">Background Image</label>

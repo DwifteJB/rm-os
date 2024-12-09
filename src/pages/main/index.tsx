@@ -6,10 +6,11 @@ import BootSequence from "../boot";
 import Shortcut from "../../components/Shortcut";
 import TopBar from "../../components/TopBar";
 
-import AboutWindow from "../../windows/about";
+//import AboutWindow from "../../windows/about";
 import { allWindows } from "../../lib/allWindows";
 import MeowCat from "../../windows/cat";
 import VSCode from "../../windows/vsCode";
+import ChatWindow from "../../windows/anonChat";
 
 const MainPage = () => {
   const Context = useContext(AppContext);
@@ -17,7 +18,7 @@ const MainPage = () => {
   const [hasMadeSecondRender, setHasMadeSecondRender] = useState(false);
 
   useEffect(() => {
-    const abt = AboutWindow();
+    const abt = ChatWindow();
     Context.CreateWindow(
       abt.element,
       abt.name,

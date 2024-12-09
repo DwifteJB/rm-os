@@ -1,10 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// this is due to no pyodide types! :(
+
+import React, { useState, useEffect, useRef } from "react";
 import { WindowComponentProps } from "../../../types";
-import { FileSystemNode } from '../types';
-import { findFileRecursively } from '../utils/utils';
+import { FileSystemNode } from "../types";
+import { findFileRecursively } from "../utils/utils";
 
 interface LogEntry {
-  type: 'log' | 'error' | 'info' | 'warn';
+  type: "log" | "error" | "info" | "warn";
   content: string[];
   timestamp: string;
 }
@@ -16,11 +20,26 @@ interface CodeRunnerProps extends WindowComponentProps {
   currentFileId: string;
 }
 
-const CodeRunner: React.FC<CodeRunnerProps> = ({ 
-  code, 
-  language, 
+declare global {
+  interface PyodideInterface {
+    loadPyodide: (options?: {
+      indexURL?: string;
+      stdout?: (stdout: string) => void;
+      stderr?: (stderr: string) => void;
+    }) => Promise<unknown>;
+    runPythonAsync: (code: string) => Promise<unknown>;
+  }
+
+  interface Window {
+    loadPyodide: PyodideInterface["loadPyodide"];
+    pyodide: PyodideInterface;
+  }
+}
+const CodeRunner: React.FC<CodeRunnerProps> = ({
+  code,
+  language,
   fileSystem,
-  currentFileId
+  currentFileId,
 }) => {
   const sandboxRef = useRef<HTMLIFrameElement>(null);
   const outputRef = useRef<HTMLIFrameElement>(null);
@@ -28,20 +47,106 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
   const [result, setResult] = useState<string | null>(null);
   const consoleRef = useRef<HTMLDivElement>(null);
   const blobUrlRef = useRef<string | null>(null);
+  const [isPyodideLoading, setIsPyodideLoading] = useState(false);
+  const pyodideRef = useRef<any>(null);
 
   const formatTimestamp = () => {
     const now = new Date();
-    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+    return `${now.getHours().toString().padStart(2, "0")}:${now.getMinutes().toString().padStart(2, "0")}:${now.getSeconds().toString().padStart(2, "0")}`;
   };
 
-  const addLog = (type: LogEntry['type'], ...args: unknown[]) => {
-    setLogs(prev => [...prev, {
-      type,
-      content: args.map(arg => 
-        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-      ),
-      timestamp: formatTimestamp()
-    }]);
+  const addLog = (type: LogEntry["type"], ...args: unknown[]) => {
+    setLogs((prev) => [
+      ...prev,
+      {
+        type,
+        content: args.map((arg) =>
+          typeof arg === "object" ? JSON.stringify(arg, null, 2) : String(arg),
+        ),
+        timestamp: formatTimestamp(),
+      },
+    ]);
+  };
+  const initializePyodide = async () => {
+    if (pyodideRef.current) return;
+
+    setIsPyodideLoading(true);
+    addLog("info", "Initializing Python environment...");
+
+    try {
+      if (!document.querySelector("#pyodide-script")) {
+        const script = document.createElement("script");
+        script.id = "pyodide-script";
+        script.src = "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"; // could add to public folder, but this works
+        document.head.appendChild(script);
+
+        await new Promise((resolve, reject) => {
+          script.onload = resolve;
+          script.onerror = reject;
+        });
+      }
+
+      pyodideRef.current = await window.loadPyodide({
+        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.24.1/full/",
+        stdout: (text: string) => addLog("log", text),
+        stderr: (text: string) => addLog("error", text),
+      });
+
+      // setup pyodide rahh
+      await pyodideRef.current.runPythonAsync(`
+        import sys
+        from pyodide.ffi import to_js
+        from pyodide.console import ConsoleOutput
+  
+        # log but to javascript
+        def custom_print(*args, sep=' ', end='\\n', **kwargs):
+            output = ConsoleOutput()
+            print(*args, sep=sep, end=end, file=output)
+            text = output.getvalue()
+            to_js({'type': 'log', 'args': [text]})
+  
+        # make stdout and stderr go to the console!
+        sys.stdout = ConsoleOutput()
+        sys.stderr = ConsoleOutput()
+        
+        # print -> js
+        __builtins__.print = custom_print
+  
+        # common imports to help noobs!
+        import math
+        import json
+        import random
+        
+        # format the exception nicely
+        def format_exception(e):
+            return f"{type(e).__name__}: {str(e)}"
+      `);
+
+      addLog("info", "Python environment ready!");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPyodideLoading(false);
+    }
+  };
+
+  const runPython = async () => {
+    setLogs([]);
+    setResult(null);
+
+    if (!pyodideRef.current) {
+      await initializePyodide();
+    }
+
+    try {
+      const result = await pyodideRef.current.runPythonAsync(code);
+      if (result !== undefined) {
+        const jsResult = result.toJs ? result.toJs() : result;
+        setResult(JSON.stringify(jsResult, null, 2));
+      }
+    } catch (err) {
+      addLog("error", (err as Error)?.message || "Python execution error");
+    }
   };
 
   const runJavaScript = () => {
@@ -112,7 +217,7 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
       </html>
     `;
 
-    const blob = new Blob([sandboxHtml], { type: 'text/html' });
+    const blob = new Blob([sandboxHtml], { type: "text/html" });
     const blobUrl = URL.createObjectURL(blob);
     blobUrlRef.current = blobUrl;
 
@@ -122,12 +227,15 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
   };
 
   const findScriptContent = (path: string): string | null => {
-    const findFileByPath = (nodes: FileSystemNode[], targetPath: string): FileSystemNode | null => {
+    const findFileByPath = (
+      nodes: FileSystemNode[],
+      targetPath: string,
+    ): FileSystemNode | null => {
       for (const node of nodes) {
-        if (node.type === 'file' && node.name === targetPath) {
+        if (node.type === "file" && node.name === targetPath) {
           return node;
         }
-        if (node.type === 'folder' && node.children) {
+        if (node.type === "folder" && node.children) {
           const found = findFileByPath(node.children, targetPath);
           if (found) return found;
         }
@@ -141,13 +249,14 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
 
   const processHTMLImports = (htmlContent: string): string => {
     const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    
-    const currentFile = findFileRecursively(fileSystem, currentFileId);
-    const currentDir = currentFile?.name.split('/').slice(0, -1).join('/') || '';
+    const doc = parser.parseFromString(htmlContent, "text/html");
 
-    const consoleScript = doc.createElement('script');
-    consoleScript.setAttribute('id', 'console-capture');
+    const currentFile = findFileRecursively(fileSystem, currentFileId);
+    const currentDir =
+      currentFile?.name.split("/").slice(0, -1).join("/") || "";
+
+    const consoleScript = doc.createElement("script");
+    consoleScript.setAttribute("id", "console-capture");
     consoleScript.textContent = `
       if (!window.__consoleInitialized) {
         window.__consoleInitialized = true;
@@ -177,40 +286,43 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
     `;
     doc.head.insertBefore(consoleScript, doc.head.firstChild);
 
-    doc.querySelectorAll('script:not(#console-capture)').forEach(script => {
-      const src = script.getAttribute('src');
-      if (src && !src.startsWith('http') && !src.startsWith('//')) {
-        const normalizedPath = src.startsWith('./') ? src.slice(2) : src;
-        const fullPath = currentDir ? `${currentDir}/${normalizedPath}` : normalizedPath;
-        
+    doc.querySelectorAll("script:not(#console-capture)").forEach((script) => {
+      const src = script.getAttribute("src");
+      if (src && !src.startsWith("http") && !src.startsWith("//")) {
+        const normalizedPath = src.startsWith("./") ? src.slice(2) : src;
+        const fullPath = currentDir
+          ? `${currentDir}/${normalizedPath}`
+          : normalizedPath;
+
         const scriptContent = findScriptContent(fullPath);
         if (scriptContent) {
-          script.removeAttribute('src');
+          script.removeAttribute("src");
           script.textContent = scriptContent;
         }
       }
     });
 
-    doc.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href && !href.startsWith('http') && !href.startsWith('//')) {
-            const normalizedPath = href.startsWith('./') ? href.slice(2) : href;
-            const fullPath = currentDir ? `${currentDir}/${normalizedPath}` : normalizedPath;
-            
-            const styleContent = findScriptContent(fullPath);
-            if (styleContent) {
-            const style = doc.createElement('style');
-            style.textContent = styleContent;
-            link.replaceWith(style);
-            }
-        }
-        }
-    );
+    doc.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
+      const href = link.getAttribute("href");
+      if (href && !href.startsWith("http") && !href.startsWith("//")) {
+        const normalizedPath = href.startsWith("./") ? href.slice(2) : href;
+        const fullPath = currentDir
+          ? `${currentDir}/${normalizedPath}`
+          : normalizedPath;
 
-    doc.querySelectorAll('script:not(#console-capture)').forEach(script => {
-        if (script.hasAttributes()) {
-            script.remove();
+        const styleContent = findScriptContent(fullPath);
+        if (styleContent) {
+          const style = doc.createElement("style");
+          style.textContent = styleContent;
+          link.replaceWith(style);
         }
+      }
+    });
+
+    doc.querySelectorAll("script:not(#console-capture)").forEach((script) => {
+      if (script.hasAttributes()) {
+        script.remove();
+      }
     });
 
     return doc.documentElement.outerHTML;
@@ -224,47 +336,46 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
       const processedHTML = processHTMLImports(code);
       const iframe = outputRef.current;
       const doc = iframe.contentDocument;
-      
+
       if (doc) {
         doc.open();
-        doc.write('<!DOCTYPE html>');
+        doc.write("<!DOCTYPE html>");
         doc.close();
-        
+
         doc.open();
         doc.write(processedHTML);
         doc.close();
-
-        
       }
     }
   };
 
   const handleMessage = (event: MessageEvent) => {
-    if (!event.data || typeof event.data !== 'object') return;
-    
+    if (!event.data || typeof event.data !== "object") return;
+
     const { type, args } = event.data;
     if (!type || !args) return;
-  
-    if (type === 'result') {
+
+    if (type === "result") {
       setResult(
-        typeof args[0] === 'object' 
-          ? JSON.stringify(args[0], null, 2) 
-          : String(args[0])
+        typeof args[0] === "object"
+          ? JSON.stringify(args[0], null, 2)
+          : String(args[0]),
       );
     } else {
-        const duplicateIndex = logs.findIndex(log => log.timestamp === formatTimestamp());
-        if (duplicateIndex > -1) {
-          setLogs(prev => prev.filter((_, index) => index !== duplicateIndex));
-        }
-
-      addLog(type as LogEntry['type'], ...args);
+      const duplicateIndex = logs.findIndex(
+        (log) => log.timestamp === formatTimestamp(),
+      );
+      if (duplicateIndex > -1) {
+        setLogs((prev) => prev.filter((_, index) => index !== duplicateIndex));
+      }
+      addLog(type as LogEntry["type"], ...args);
     }
   };
-  
+
   useEffect(() => {
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
       if (blobUrlRef.current) {
         URL.revokeObjectURL(blobUrlRef.current);
       }
@@ -272,42 +383,52 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
   }, []);
 
   useEffect(() => {
-    if (language === 'javascript') {
+    if (language === "python") {
+      runPython();
+    } else if (language === "javascript") {
       runJavaScript();
-    } else if (language === 'html') {
+    } else if (language === "html") {
       runHTML();
     }
   }, [code, language]);
 
   const renderLogEntry = (entry: LogEntry) => {
     const colorClass = {
-      log: 'text-white',
-      error: 'text-red-500',
-      warn: 'text-yellow-500',
-      info: 'text-blue-500'
+      log: "text-white",
+      error: "text-red-500",
+      warn: "text-yellow-500",
+      info: "text-blue-500",
     }[entry.type];
 
     return (
       <div className={`font-mono text-sm ${colorClass} mb-1`}>
         <span className="text-gray-500 text-xs mr-2">[{entry.timestamp}]</span>
-        {entry.content.join(' ')}
+        {entry.content.join(" ")}
       </div>
     );
   };
 
   return (
     <div className="h-full w-full bg-[#1e1e1e] flex flex-col">
-      <iframe 
+      {isPyodideLoading && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="text-white text-sm">
+            Loading Python environment...
+          </div>
+        </div>
+      )}
+
+      <iframe
         ref={sandboxRef}
         className="hidden"
         sandbox="allow-scripts"
         title="sandbox"
       />
-      
-      {language === 'html' ? (
+
+      {language === "html" ? (
         <div className="flex flex-col h-full">
           <div className="flex-1">
-            <iframe 
+            <iframe
               ref={outputRef}
               className="w-full h-full bg-white"
               sandbox="allow-scripts allow-same-origin"
@@ -315,7 +436,7 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
             />
           </div>
           {logs.length > 0 && (
-            <div 
+            <div
               ref={consoleRef}
               className="h-32 p-4 border-t border-gray-700 bg-[#1e1e1e] text-white text-sm font-mono whitespace-pre-wrap overflow-auto"
             >
@@ -326,9 +447,7 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
           )}
         </div>
       ) : (
-        <div 
-          className="p-4 text-white text-sm font-mono whitespace-pre-wrap overflow-auto h-full"
-        >
+        <div className="p-4 text-white text-sm font-mono whitespace-pre-wrap overflow-auto h-full">
           {logs.map((log, index) => (
             <div key={index}>{renderLogEntry(log)}</div>
           ))}

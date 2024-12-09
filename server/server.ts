@@ -34,7 +34,6 @@ app.use(
 app.use(express.static(join(__dirname, publicPath)));
 app.use("/uv/", express.static(uvPath));
 console.log(uvPath);
-console.log;
 app.use("/epoxy/", express.static(epoxyPath));
 app.use("/baremux/", express.static(baremuxPath));
 app.use("/baremod/", express.static(bareModulePath));

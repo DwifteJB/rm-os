@@ -6,6 +6,8 @@ import prisma from "../lib/Prisma";
 import crypto from "crypto";
 import * as ws from "ws";
 
+const rateLimittedIps = new Map<string, number>();
+
 /*
  event.context.ip =
     getHeader(event, "cf-connecting-ip") ||
@@ -31,10 +33,49 @@ const generateUsername = (req: express.Request) => {
   return username;
 };
 
+const RemoveInactiveIps = () => {
+  rateLimittedIps.forEach((value, key) => {
+    if (value < Date.now() + 1000 * 20) {
+      rateLimittedIps.delete(key);
+    }
+  });
+}
+
 export default function ChatRoutes(
   app: expressWs.Application,
   getWss: () => ws.WebSocketServer,
 ) {
+
+
+  app.use((req, res, next) => {
+    // check if websocket
+    if (!req.path.startsWith("/chat")) {
+      return next();
+    }
+    
+    RemoveInactiveIps();
+
+    const ip =
+      req.headers["CF-Connecting-IP"] ||
+      req.headers["x-real-ip"] ||
+      req.headers["x-forwarded-for"] ||
+      "unknown";
+
+    if (rateLimittedIps.has(ip as string)) {
+      if (rateLimittedIps.get(ip as string)! > Date.now()) {
+        res.status(429).json({
+          error: "Rate limited",
+        });
+        return;
+      }
+    }
+
+    rateLimittedIps.set(ip as string, Date.now() + 1000 * 2); // 2 seconds
+
+    next();
+
+  })
+
   app.ws("/chat", (ws, req) => {
     const username = generateUsername(req);
     (ws as any).username = username;

@@ -53,7 +53,7 @@ export interface AppContextType {
   windows: ReactElement<windowProps>[];
   hiddenWindows: Set<string>;
   toggleWindowVisibility: (windowId: string) => void;
-  setSettings: (settings: Settings) => void;
+  setSettings: React.Dispatch<React.SetStateAction<Settings>>;
   settings: Settings;
   loading: {
     loading: boolean;

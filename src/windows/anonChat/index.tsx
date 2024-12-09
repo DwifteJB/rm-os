@@ -1,4 +1,5 @@
-import { Send } from "lucide-react";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useRef } from "react";
 
 import toast from "react-hot-toast";
@@ -25,7 +26,6 @@ const ChatPage = () => {
     };
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log("data", data);
       if (data.type === "username") {
         setUsername(data.username);
       } else if (data.type === "message") {
@@ -64,7 +64,6 @@ const ChatPage = () => {
     try {
       const response = await fetch(`/chat/getMessages?page=${page}`);
       const data = await response.json();
-      console.log(data.reverse(), data);
       setMessages((prevMessages) => [
         ...data.map((msg: any) => ({
           type: "message",
@@ -93,52 +92,42 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="text-white h-full w-full flex flex-col overflow-hidden">
-      <h1 className="">You are logged in as: {username}</h1>
-      <div
-        className="flex-1 overflow-y-auto scroll-m-1 scroll-smooth "
-        onScroll={handleScroll}
-      >
-        <div className="min-h-full flex flex-col justify-end">
-          <div className="h-4"></div>
-          {loading && <div>Loading...</div>}
-          {messages.map((msg, index) => (
+    <div className="text-green-400 h-full w-full flex flex-col overflow-hidden font-mono">
+      <div className="flex-1 overflow-y-auto p-2" onScroll={handleScroll}>
+        {loading && <div className="text-green-400">Loading...</div>}
+        <div ref={messagesEndRef} />
+        {messages.map((msg, index) => (
+          <div key={index} className="mb-2">
             <div
-              key={index}
-              className={`flex inter ${
-                msg.username === username ? "justify-end" : "justify-start"
+              className={`flex items-start space-x-2 ${
+                msg.username !== username ? "text-yellow-400" : "text-green-400"
               }`}
             >
-              <div
-                className={`p-2 inter m-2 rounded-lg ${
-                  msg.username === username
-                    ? "bg-[#C22DC2]/50"
-                    : "bg-gray-500/50"
-                }`}
-              >
-                <strong className="inter-bold">{msg.username}: </strong>
-                <span className="inter">{msg.message}</span>
-              </div>
+              <span className="text-gray-500">$</span>
+              <span className="font-bold">{msg.username}@os.rmfosho.me:</span>
+              <span className="whitespace-pre-wrap break-all">
+                {msg.message}
+              </span>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
+          </div>
+        ))}
+
+        <div className="flex items-center space-x-2">
+          <span className="text-gray-500">$</span>
+          <span className="text-green-400">{username}@os.rmfosho.me: </span>
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage();
+              }
+            }}
+            className="flex-1 bg-transparent text-green-400 focus:outline-none font-mono border-none"
+            placeholder="Type your message..."
+          />
         </div>
-      </div>
-      <div className="flex">
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSendMessage();
-            }
-          }}
-          className="flex-1 p-2 bg-transparent inter border border-white rounded-xl"
-        />
-        <button onClick={handleSendMessage} className="p-2 pl-4">
-          <Send />
-        </button>
       </div>
     </div>
   );
