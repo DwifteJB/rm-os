@@ -41,6 +41,9 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
   fileSystem,
   currentFileId,
 }) => {
+
+  const windowId = useRef(Math.random().toString(36).slice(2));
+
   const sandboxRef = useRef<HTMLIFrameElement>(null);
   const outputRef = useRef<HTMLIFrameElement>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -103,7 +106,7 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
             output = ConsoleOutput()
             print(*args, sep=sep, end=end, file=output)
             text = output.getvalue()
-            to_js({'type': 'log', 'args': [text]})
+            to_js({'windowId': '${windowId.current}', 'type': 'log', 'args': [text]})
   
         # make stdout and stderr go to the console!
         sys.stdout = ConsoleOutput()
@@ -162,8 +165,10 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
       <html>
         <head>
           <script>
+            const WINDOW_ID = "${windowId.current}";
             window.addEventListener('error', function(event) {
               window.parent.postMessage({ 
+                windowId: WINDOW_ID,
                 type: 'error', 
                 args: [event.message] 
               }, '*');
@@ -174,19 +179,19 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
             window.console = {
               log: (...args) => {
                 originalConsole.log(...args);
-                window.parent.postMessage({ type: 'log', args }, '*');
+                window.parent.postMessage({ windowId: WINDOW_ID, type: 'log', args }, '*');
               },
               error: (...args) => {
                 originalConsole.error(...args);
-                window.parent.postMessage({ type: 'error', args }, '*');
+                window.parent.postMessage({ windowId: WINDOW_ID, type: 'error', args }, '*');
               },
               warn: (...args) => {
                 originalConsole.warn(...args);
-                window.parent.postMessage({ type: 'warn', args }, '*');
+                window.parent.postMessage({ windowId: WINDOW_ID, type: 'warn', args }, '*');
               },
               info: (...args) => {
                 originalConsole.info(...args);
-                window.parent.postMessage({ type: 'info', args }, '*');
+                window.parent.postMessage({ windowId: WINDOW_ID, type: 'info', args }, '*');
               }
             };
 
@@ -198,12 +203,14 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
                 
                 if (result !== undefined) {
                   window.parent.postMessage({ 
+                    windowId: WINDOW_ID,
                     type: 'result', 
                     args: [result] 
                   }, '*');
                 }
               } catch (err) {
                 window.parent.postMessage({ 
+                  windowId: WINDOW_ID,
                   type: 'error', 
                   args: [err.message] 
                 }, '*');
@@ -255,35 +262,38 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
     const currentDir =
       currentFile?.name.split("/").slice(0, -1).join("/") || "";
 
-    const consoleScript = doc.createElement("script");
-    consoleScript.setAttribute("id", "console-capture");
-    consoleScript.textContent = `
-      if (!window.__consoleInitialized) {
-        window.__consoleInitialized = true;
-        window.console = {
-          log: (...args) => {
-            window.parent.postMessage({ type: 'log', args }, '*');
-          },
-          error: (...args) => {
-            window.parent.postMessage({ type: 'error', args }, '*');
-          },
-          warn: (...args) => {
-            window.parent.postMessage({ type: 'warn', args }, '*');
-          },
-          info: (...args) => {
-            window.parent.postMessage({ type: 'info', args }, '*');
-          }
-        };
-        
-        window.addEventListener('error', function(event) {
-          window.parent.postMessage({ 
-            type: 'error', 
-            args: [event.message] 
-          }, '*');
-          event.preventDefault();
-        });
-      }
-    `;
+      const consoleScript = doc.createElement("script");
+      consoleScript.setAttribute("id", "console-capture");
+      consoleScript.textContent = `
+        const WINDOW_ID = "${windowId.current}";
+        if (!window.__consoleInitialized) {
+          window.__consoleInitialized = true;
+          window.console = {
+            log: (...args) => {
+              window.parent.postMessage({ windowId: WINDOW_ID, type: 'log', args }, '*');
+            },
+            error: (...args) => {
+              window.parent.postMessage({ windowId: WINDOW_ID, type: 'error', args }, '*');
+            },
+            warn: (...args) => {
+              window.parent.postMessage({ windowId: WINDOW_ID, type: 'warn', args }, '*');
+            },
+            info: (...args) => {
+              window.parent.postMessage({ windowId: WINDOW_ID, type: 'info', args }, '*');
+            }
+          };
+          
+          window.addEventListener('error', function(event) {
+            window.parent.postMessage({ 
+              windowId: WINDOW_ID,
+              type: 'error', 
+              args: [event.message] 
+            }, '*');
+            event.preventDefault();
+          });
+        }
+      `;
+  
     doc.head.insertBefore(consoleScript, doc.head.firstChild);
 
     doc.querySelectorAll("script:not(#console-capture)").forEach((script) => {
@@ -352,8 +362,8 @@ const CodeRunner: React.FC<CodeRunnerProps> = ({
   const handleMessage = (event: MessageEvent) => {
     if (!event.data || typeof event.data !== "object") return;
 
-    const { type, args } = event.data;
-    if (!type || !args) return;
+    const { windowId: messageWindowId, type, args } = event.data;
+    if (!type || !args || messageWindowId !== windowId.current) return;
 
     if (type === "result") {
       setResult(
