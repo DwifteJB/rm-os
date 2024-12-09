@@ -65,7 +65,7 @@ const ChatPage = () => {
       const response = await fetch(`/chat/getMessages?page=${page}`);
       const data = await response.json();
       setMessages((prevMessages) => [
-        ...data.map((msg: any) => ({
+        ...data.reverse().map((msg: any) => ({
           type: "message",
           message: msg.content,
           username: msg.author,
@@ -95,7 +95,6 @@ const ChatPage = () => {
     <div className="text-green-400 h-full w-full flex flex-col overflow-hidden font-mono">
       <div className="flex-1 overflow-y-auto p-2" onScroll={handleScroll}>
         {loading && <div className="text-green-400">Loading...</div>}
-        <div ref={messagesEndRef} />
         {messages.map((msg, index) => (
           <div key={index} className="mb-2">
             <div
@@ -111,6 +110,7 @@ const ChatPage = () => {
             </div>
           </div>
         ))}
+        
 
         <div className="flex items-center space-x-2">
           <span className="text-gray-500">$</span>
@@ -128,6 +128,9 @@ const ChatPage = () => {
             placeholder="Type your message..."
           />
         </div>
+
+        <div ref={messagesEndRef} />
+
       </div>
     </div>
   );
