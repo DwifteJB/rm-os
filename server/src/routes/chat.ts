@@ -20,10 +20,11 @@ const generateUsername = (req: express.Request) => {
   const userAgent = req.headers["user-agent"] || "unknown";
   console.log("test", req.headers);
   const ip =
-    req.headers["CF-Connecting-IP"] ||
+    req.headers["cf-connecting-ip"] ||
     req.headers["x-real-ip"] ||
     req.headers["x-forwarded-for"] ||
     "unknown";
+  console.log("ip", ip);
   const uniqueString = `${ip}-${userAgent}`;
   const username = crypto
     .createHash("md5")
@@ -57,7 +58,7 @@ export default function ChatRoutes(
     RemoveInactiveIps();
 
     const ip =
-      req.headers["CF-Connecting-IP"] ||
+      req.headers["cf-connecting-ip"] ||
       req.headers["x-real-ip"] ||
       req.headers["x-forwarded-for"] ||
       "unknown";
