@@ -18,6 +18,7 @@ const rateLimittedIps = new Map<string, number>();
 // we generate username so its anon!
 const generateUsername = (req: express.Request) => {
   const userAgent = req.headers["user-agent"] || "unknown";
+  console.log("test", req.headers);
   const ip =
     req.headers["CF-Connecting-IP"] ||
     req.headers["x-real-ip"] ||
@@ -52,7 +53,7 @@ export default function ChatRoutes(
     if (!req.path.startsWith("/chat")) {
       return next();
     }
-    
+
     RemoveInactiveIps();
 
     const ip =
