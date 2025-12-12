@@ -1,0 +1,39 @@
+
+services:
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: USER
+      POSTGRES_PASSWORD: PASSWORD
+      POSTGRES_DB: rm_database
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+  app:
+    build: .
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://USER:PASSWORD@rm-os-postgres-1:5432/rm_database
+    ports:
+      - "3000:3000"
+    networks:
+      - default
+    
+  tunneler:
+    container_name: cloudflared-tunnel
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=<>
+    networks:
+      - default
+    depends_on:
+      - app
+
+networks:
+  default:
+    driver: bridge

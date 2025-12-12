@@ -10,7 +10,7 @@ export interface BadWordResponse {
   flaggedFor: string;
 }
 
-const acceptableBadWords = ["fuck", "shit", "bitch"];
+const acceptableBadWords = ["fuck", "shit", "bitch", "gay", "homo", "homosexual"];
 
 const removeAcceptableBadWords = (
   message: string,

@@ -26,7 +26,12 @@ const textToContinue: TextContinue[] = [
   {
     text: "[rm-os]: Loading desktop...",
     color: "text-blue-400",
-    time: 500,
+    time: 1500,
+  },
+  {
+    text: "THIS PROGRAM IS ENDORSED BY EDDIE N/A !!!!!!!!!",
+    color: "text-red-400",
+    time: 1000,
   },
   {
     text: "[rm-os]: Welcome!",
